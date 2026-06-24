@@ -136,7 +136,9 @@ synthetic data. Watch it with `canvas logs --host <subdomain>`. Turn it off with
 > Note: the CGM **chart-summary section** additionally requires registering the
 > section into the chart layout (`SHOW_PATIENT_CHART_SUMMARY_SECTIONS`), which
 > replaces the layout globally; it is intentionally left out so the plugin does
-> not alter shared-instance chart layouts.
+> not alter shared-instance chart layouts. Instead, the plugin registers a
+> **patient-chart Application** ("CGM Insights") — a launcher icon in the chart
+> that opens the AGP view in a right-hand pane, without touching the global layout.
 
 
 ## Data & privacy

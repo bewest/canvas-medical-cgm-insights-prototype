@@ -21,6 +21,15 @@
         "commands": [],
         "content": [],
         "effects": [],
+        "applications": [
+            {
+                "class": "cgm_insights.applications.cgm_app:CGMChartApp",
+                "name": "CGM Insights",
+                "description": "Open the AGP-style CGM summary and glycemic triage for this patient.",
+                "scope": "patient_specific",
+                "icon": "assets/icon.png"
+            }
+        ],
         "views": []
     },
     "variables": [
