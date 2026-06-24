@@ -91,20 +91,32 @@ python -m scripts.run --fixture at_goal --html /tmp/out.html
 a configured instance (`~/.canvas/credentials.ini`). Use a **de-identified**
 Nightscout source, since data written into Canvas must not contain PHI.
 
+The one value that cannot be inferred is your Canvas instance **subdomain**
+(for `https://acme-dev.canvasmedical.com` it is `acme-dev`). The
+`credentials.ini` section name must equal that subdomain, and the keys must be
+`client_id` / `client_secret`. A helper handles the section naming and install:
+
 ```bash
 pip install canvas
+# <subdomain> is required; Nightscout args are optional (set later if omitted):
+scripts/install_to_sandbox.sh <subdomain> [nightscout_url] [nightscout_token]
+```
+
+Or do it manually:
+
+```bash
 canvas validate-manifest cgm_insights
-canvas install cgm_insights \
+canvas install cgm_insights --host <subdomain> \
   --variable NIGHTSCOUT_URL=https://your-ns.example \
   --variable NIGHTSCOUT_TOKEN=your-read-token
-canvas logs            # stream plugin logs while you interact
-
-# Then, in the Canvas UI:
-#   - Open a patient chart  -> the CGM summary custom section renders.
-#   - Create an encounter note for that patient (NOTE_STATE_CHANGE_EVENT_CREATED)
-#     -> the phenotype triage ProtocolCard (+ hypo banner) appears, and, when the
-#        patient's CGM data is sufficient, the billing-readiness card.
+canvas logs --host <subdomain>     # stream plugin logs while you interact
 ```
+
+Then, in the Canvas UI:
+- Open a patient chart → the CGM summary custom section renders.
+- Create an encounter note (`NOTE_STATE_CHANGE_EVENT_CREATED`) → the phenotype
+  triage ProtocolCard (+ hypo banner) appears, and, when the patient's CGM data
+  is sufficient, the billing-readiness card.
 
 
 ## Data & privacy
