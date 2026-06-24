@@ -13,6 +13,7 @@ from canvas_sdk.effects.banner_alert import AddBannerAlert
 from canvas_sdk.effects.protocol_card import ProtocolCard, Recommendation
 from canvas_sdk.events import EventType
 from canvas_sdk.handlers import BaseHandler
+from logger import log
 
 from cgm_insights.core.metrics import compute_metrics
 from cgm_insights.core.triage import Phenotype, classify, hypo_safety_check
@@ -54,12 +55,14 @@ class CGMTriageProtocol(BaseHandler):
         data = load_patient_cgm(self.secrets)
         metrics = compute_metrics(data.sgv_values)
         if metrics is None:
+            log.info("cgm_insights: triage skipped, no Nightscout data for patient")
             return []
 
         result = classify(metrics)
         if result.phenotype == Phenotype.INSUFFICIENT_DATA:
             return []
 
+        log.info(f"cgm_insights: triage -> {result.phenotype.value} (TIR {metrics.tir:.0f}%)")
         effects = build_triage_effects(patient_id, metrics, result_phenotype=result.phenotype,
                                        result_reason=result.reason,
                                        result_label=result.label,

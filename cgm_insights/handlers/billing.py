@@ -24,6 +24,7 @@ from canvas_sdk.effects.observation.base import (
 from canvas_sdk.effects.protocol_card import ProtocolCard, Recommendation
 from canvas_sdk.events import EventType
 from canvas_sdk.handlers import BaseHandler
+from logger import log
 
 from cgm_insights.core.billing import (
     BillingArtifacts,
@@ -56,8 +57,13 @@ class CGMBillingDocumentation(BaseHandler):
         suff = assess_sufficiency(data.entries)
         if not suff.any_eligible:
             # Not enough data to support any billing code yet; emit nothing.
+            log.info(
+                f"cgm_insights: billing skipped, data not yet sufficient "
+                f"({suff.hours:.0f}h, {suff.days_with_data}d)"
+            )
             return []
 
+        log.info(f"cgm_insights: billing-ready, eligible CPT {suff.eligible_codes}")
         artifacts = build_billing_artifacts(metrics, suff)
         return build_billing_effects(str(patient_id), artifacts)
 

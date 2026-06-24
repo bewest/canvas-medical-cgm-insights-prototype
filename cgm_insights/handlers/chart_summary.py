@@ -12,6 +12,7 @@ from canvas_sdk.effects.patient_chart_summary_custom_section import (
 from canvas_sdk.handlers.patient_chart_summary_custom_section_handler import (
     PatientChartSummaryCustomSectionHandler,
 )
+from logger import log
 
 from cgm_insights.core.agp import render_agp
 from cgm_insights.core.metrics import compute_metrics
@@ -34,8 +35,13 @@ class CGMSummarySection(PatientChartSummaryCustomSectionHandler):
         metrics = compute_metrics(data.sgv_values)
 
         if metrics is None:
+            log.info("cgm_insights: summary section requested, no Nightscout data configured")
             content = _NO_DATA_HTML
         else:
+            log.info(
+                f"cgm_insights: summary section rendered ({metrics.n} readings, "
+                f"TIR {metrics.tir:.0f}%)"
+            )
             content = render_agp(metrics, data.entries)
 
         return [
