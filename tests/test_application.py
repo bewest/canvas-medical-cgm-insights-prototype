@@ -24,7 +24,8 @@ def test_render_view_no_data():
 
 
 def test_application_imports_and_identifier():
-    from cgm_insights.applications.cgm_app import CGMChartApp
+    from cgm_insights.applications.cgm_app import CGMChartApp, CGMGlobalApp
 
-    # Application base exposes a stable identifier property.
+    # Application classes expose a stable identifier property.
     assert CGMChartApp.__name__ == "CGMChartApp"
+    assert CGMGlobalApp.__name__ == "CGMGlobalApp"

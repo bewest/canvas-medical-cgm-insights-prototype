@@ -23,6 +23,13 @@
         "effects": [],
         "applications": [
             {
+                "class": "cgm_insights.applications.cgm_app:CGMGlobalApp",
+                "name": "CGM Insights",
+                "description": "Open the AGP-style CGM summary and glycemic triage (global app drawer).",
+                "scope": "global",
+                "icon": "assets/icon.png"
+            },
+            {
                 "class": "cgm_insights.applications.cgm_app:CGMChartApp",
                 "name": "CGM Insights",
                 "description": "Open the AGP-style CGM summary and glycemic triage for this patient.",

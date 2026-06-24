@@ -62,3 +62,22 @@ class CGMChartApp(Application):
             target=LaunchModalEffect.TargetType.RIGHT_CHART_PANE_LARGE,
             title="CGM Insights",
         ).apply()
+
+
+class CGMGlobalApp(Application):
+    """A global (app-drawer) application that opens the CGM Insights view.
+
+    Scoped globally so it appears in the top-level app drawer (alongside other
+    global apps) without requiring a patient context. Renders the same view; in
+    demo mode it shows the synthetic series.
+    """
+
+    def on_open(self) -> Effect:
+        """Render the CGM view as a full page from the global app drawer."""
+        data = load_patient_cgm(self.secrets)
+        log.info(f"cgm_insights: global app opened ({len(data.entries)} readings)")
+        return LaunchModalEffect(
+            content=render_view(data),
+            target=LaunchModalEffect.TargetType.PAGE,
+            title="CGM Insights",
+        ).apply()
