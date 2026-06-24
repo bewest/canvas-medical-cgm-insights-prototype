@@ -1,0 +1,45 @@
+# ---- Secrets / credentials (NEVER commit) ----
+*.env
+.env
+.env.*
+first.env
+*.credentials
+credentials.ini
+.canvas/
+secrets/
+*.pem
+*.key
+
+# Editor swap / temp files
+*.swp
+*.swo
+*~
+.*.swp
+.DS_Store
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Canvas plugin packaging ----
+*.canvas
+.canvasignore.local
+
+# ---- Local data / PHI safety ----
+# Never commit real patient data. Keep CGM fixtures de-identified and explicit.
+data/private/
+*.phi.json
+local-nightscout/
+.venv/

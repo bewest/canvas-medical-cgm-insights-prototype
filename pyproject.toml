@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cgm_insights"
+version = "0.1.0"
+description = "Canvas Medical plugin: CGM analysis, glycemic phenotype triage, and billing-readiness documentation from Nightscout data."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Ben West" }]
+keywords = ["canvas-medical", "ehr", "cgm", "diabetes", "nightscout"]
+
+# Runtime note: the plugin itself runs inside the Canvas RestrictedPython
+# sandbox and imports only canvas_sdk + a curated stdlib subset. The core/
+# package is intentionally dependency-free pure Python. No third-party runtime
+# dependencies are required.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["cgm_insights*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

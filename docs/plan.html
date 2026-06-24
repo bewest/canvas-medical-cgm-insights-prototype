@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas Medical + Diabetes ML: Feasibility Plan</title>
+  <style>
+    :root {
+      --canvas-blue: #1a56db;
+      --canvas-dark: #111827;
+      --canvas-mid: #374151;
+      --canvas-light: #f9fafb;
+      --canvas-border: #e5e7eb;
+      --accent-green: #059669;
+      --accent-amber: #d97706;
+      --accent-red: #dc2626;
+      --accent-purple: #7c3aed;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--canvas-light);
+      color: var(--canvas-dark);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+    header {
+      background: var(--canvas-blue);
+      color: #fff;
+      padding: 2.5rem 3rem;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p { margin-top: 0.5rem; opacity: 0.85; font-size: 1rem; max-width: 720px; }
+    header .meta { margin-top: 1rem; font-size: 0.8rem; opacity: 0.65; }
+
+    nav {
+      background: #fff;
+      border-bottom: 1px solid var(--canvas-border);
+      padding: 0.75rem 3rem;
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav a { color: var(--canvas-blue); text-decoration: none; font-weight: 500; }
+    nav a:hover { text-decoration: underline; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2.5rem 3rem 4rem; }
+
+    section { margin-bottom: 3rem; }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--canvas-dark);
+      border-left: 4px solid var(--canvas-blue);
+      padding-left: 0.75rem;
+      margin-bottom: 1.1rem;
+    }
+    h3 { font-size: 1.05rem; font-weight: 600; margin: 1.4rem 0 0.5rem; color: var(--canvas-mid); }
+    p { margin-bottom: 0.8rem; }
+    ul, ol { padding-left: 1.4rem; margin-bottom: 0.8rem; }
+    li { margin-bottom: 0.3rem; }
+
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+    .callout.blue   { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .callout.green  { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .callout.amber  { background: #fffbeb; border: 1px solid #fde68a; }
+    .callout.purple { background: #f5f3ff; border: 1px solid #ddd6fe; }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .tier-card {
+      background: #fff;
+      border: 1px solid var(--canvas-border);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+    }
+    .tier-card .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-bottom: 0.5rem;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-amber  { background: #fef3c7; color: #78350f; }
+    .badge-purple { background: #ede9fe; color: #4c1d95; }
+    .tier-card h4 { font-size: 0.97rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .tier-card p  { font-size: 0.87rem; color: var(--canvas-mid); margin: 0; }
+
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+    .api-table th {
+      background: var(--canvas-blue);
+      color: #fff;
+      text-align: left;
+      padding: 0.55rem 0.8rem;
+      font-weight: 600;
+    }
+    .api-table td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--canvas-border);
+      vertical-align: top;
+    }
+    .api-table tr:nth-child(even) td { background: #f9fafb; }
+
+    code {
+      font-family: "SFMono-Regular", Menlo, monospace;
+      background: #f3f4f6;
+      border: 1px solid var(--canvas-border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.82em;
+    }
+    pre {
+      background: #1e2130;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      font-family: "SFMono-Regular", Menlo, monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      margin: 0.8rem 0;
+      line-height: 1.5;
+    }
+
+    .arch-box {
+      background: #fff;
+      border: 1px solid var(--canvas-border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+    }
+    .arch-node {
+      background: #eff6ff;
+      border: 1.5px solid #93c5fd;
+      border-radius: 6px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1d4ed8;
+      white-space: nowrap;
+    }
+    .arch-node.green { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+    .arch-node.purple { background: #f5f3ff; border-color: #c4b5fd; color: #4c1d95; }
+    .arch-node.amber { background: #fffbeb; border-color: #fcd34d; color: #78350f; }
+    .arch-arrow { font-size: 1rem; color: #9ca3af; }
+
+    .question-box {
+      background: #fff;
+      border: 2px solid var(--canvas-blue);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .question-box h4 { color: var(--canvas-blue); font-size: 0.9rem; font-weight: 700;
+                       text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .question-box ol { padding-left: 1.2rem; font-size: 0.9rem; }
+
+    footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.8rem;
+      padding: 2rem;
+      border-top: 1px solid var(--canvas-border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Canvas Medical + Diabetes ML: Feasibility Plan</h1>
+  <p>Exploring what can be built at the intersection of diabetes domain expertise, the
+     <code>cgmencode</code> toolkit, and the Canvas Medical SDK and FHIR API.</p>
+  <div class="meta">Prepared: June 2026 &nbsp;|&nbsp; Author: Ben West &nbsp;|&nbsp; Context: canvas-health-prototype
+    &nbsp;|&nbsp; API claims verified against canvas-medical/canvas-plugins v0.173.0 source</div>
+</header>
+
+<nav>
+  <a href="#context">Context</a>
+  <a href="#assets">What We Bring</a>
+  <a href="#canvas-api">Canvas API</a>
+  <a href="#nightscout">Nightscout Bridge</a>
+  <a href="#topology">Where Code Lives</a>
+  <a href="#opportunities">Opportunities</a>
+  <a href="#poc">POC Scope</a>
+  <a href="#tiers">Delivery Tiers</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#reimbursement">Reimbursement</a>
+  <a href="#questions">Open Questions</a>
+</nav>
+
+<main>
+
+<!-- ======================== CONTEXT ======================== -->
+<section id="context">
+  <h2>1. Context and Motivation</h2>
+  <p>Canvas Medical is a modern, API-first EHR designed for primary care and
+     value-based practices. Its distinguishing feature is a Python plugin SDK that
+     allows developers to embed arbitrary clinical logic directly inside the EHR,
+     responding to 650+ workflow events and producing effects that alter what
+     clinicians see and do.</p>
+  <p>Diabetes, particularly Type 1 and insulin-dependent Type 2, represents a
+     high-complexity, data-rich population where care quality is highly sensitive to
+     whether the right information reaches the clinician at the right moment. Most
+     EHRs treat glucose data as passive lab values. Canvas's event and plugin
+     architecture enables something different: <strong>active, contextual decision
+     support</strong> surfaced inside the normal clinical workflow.</p>
+  <p>The <code>cgmencode</code> toolkit (from the
+     <code>rag-nightscout-ecosystem-alignment</code> project) represents several years
+     of production ML work on AID system data from Loop, AAPS, and Trio patients.
+     It includes CGM feature encoding, transformer models, clinical loss functions,
+     event classifiers, pharmacokinetics models, and a settings recommendation
+     pipeline. That signal is directly applicable inside a Canvas plugin.</p>
+
+  <div class="callout blue">
+    <strong>Core thesis:</strong> The combination of Canvas's plugin SDK with deep
+    diabetes ML infrastructure can produce decision-support tools that are
+    (a) embedded where clinicians already work, (b) grounded in real CGM/AID
+    patterns rather than textbook heuristics, and (c) structured to generate the
+    documentation chain required for reimbursement.
+  </div>
+
+  <div class="callout green">
+    <strong>Scope decisions:</strong>
+    <ul style="margin:0.4rem 0 0; padding-left:1.2rem;">
+      <li><strong>Data source:</strong> Nightscout as primary CGM backend (FHIR-capable, open source, deep
+          existing tooling in the <code>rag-nightscout-ecosystem-alignment</code> repo).</li>
+      <li><strong>Patient population:</strong> Both T1D on AID systems and insulin-dependent T2D.
+          Primary care sees both; the tool should serve the full spectrum.</li>
+      <li><strong>Primary goal:</strong> An open-source Canvas plugin that is also a portfolio artifact
+          demonstrating what can be built at this intersection.</li>
+      <li><strong>ML architecture:</strong> Canvas plugin as pure orchestrator. ML inference lives
+          entirely in a separate service that wraps the <code>cgmencode</code> research pipeline
+          and its validated experimental findings (externals/, experiments/). The plugin calls
+          that service over HTTP; it does not embed model weights or training logic.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======================== ASSETS ======================== -->
+<section id="assets">
+  <h2>2. What We Bring</h2>
+
+  <h3>cgmencode Capabilities</h3>
+  <table class="api-table">
+    <tr><th>Module</th><th>What It Does</th><th>Clinical Relevance</th></tr>
+    <tr>
+      <td><code>encoder.py / FixtureEncoder</code></td>
+      <td>Converts Nightscout / T1Pal fixture JSON into 5-min aligned feature
+          vectors: glucose, IOB, COB, temp basal, boluses, carbs</td>
+      <td>Transforms raw device data into a format suitable for analysis or
+          display inside a Canvas chart summary</td>
+    </tr>
+    <tr>
+      <td><code>clinical_loss.py / ClinicalZoneLoss</code></td>
+      <td>Asymmetric loss function: hypo errors penalized 19x more than
+          equivalent hyper errors; slope-weighted to catch rapid drops</td>
+      <td>Matches clinical reality: undetected hypoglycemia is the acute
+          safety risk; hyperglycemia is a chronic one</td>
+    </tr>
+    <tr>
+      <td><code>event_classifier.py</code></td>
+      <td>XGBoost multi-class classifier detecting upcoming meals, exercise,
+          sleep, and other glycemic events from pre-event windows</td>
+      <td>Enables predictive alerting and automated note context</td>
+    </tr>
+    <tr>
+      <td><code>override_recommender.py</code></td>
+      <td>Generates ISF / carb ratio / basal rate adjustment recommendations
+          from residual analysis and cross-validated population benchmarks</td>
+      <td>Reduces clinician manual analysis time for settings optimization
+          visits; most practices lack tools to do this at all</td>
+    </tr>
+    <tr>
+      <td><code>pattern_retrieval.py / pattern_embedding.py</code></td>
+      <td>Retrieves similar past patient patterns by embedding similarity</td>
+      <td>Evidence-based peer comparison: "patients with similar profiles
+          responded to X adjustment"</td>
+    </tr>
+    <tr>
+      <td><code>hypo_safety.py</code></td>
+      <td>Safety envelope analysis: frequency, severity, and recovery
+          patterns for hypoglycemic episodes</td>
+      <td>Directly feeds a TBR / hypo protocol card in Canvas</td>
+    </tr>
+    <tr>
+      <td><code>metrics.py</code></td>
+      <td>TIR, GMI, CV, MAGE, time below range, time above range,
+          Clarke Error Grid zone classification</td>
+      <td>Standard CGM report metrics; also maps to CMS quality measures</td>
+    </tr>
+  </table>
+
+  <h3>Domain Knowledge</h3>
+  <ul>
+    <li>Deep familiarity with AID algorithm behavior: Loop, AAPS, Trio, OpenAPS oref0/oref1</li>
+    <li>Understanding of what PCP visits vs. endocrinologist visits look like for insulin patients</li>
+    <li>Experience with Nightscout, Tidepool, T1Pal data pipelines and the FHIR surface they expose</li>
+    <li>Understanding of reimbursement requirements for CGM interpretation (CPT 95251) and remote patient
+        monitoring (RPM: CPT 99453/99454/99457)</li>
+    <li>Awareness that most meals are not logged and that reducing manual bolus burden is an
+        explicit patient goal, not just a nice-to-have</li>
+  </ul>
+</section>
+
+<!-- ======================== CANVAS API ======================== -->
+<section id="canvas-api">
+  <h2>3. Canvas API Surface (Relevant to Diabetes)</h2>
+
+  <h3>FHIR R4 Resources</h3>
+  <table class="api-table">
+    <tr><th>Resource</th><th>Diabetes Use</th></tr>
+    <tr><td><code>Observation</code></td><td>Ingest CGM readings (LOINC 15074-8), HbA1c results (4548-4),
+        TIR summaries; retrieve existing lab results</td></tr>
+    <tr><td><code>Patient</code></td><td>Demographics; flag AID system users; pull care team</td></tr>
+    <tr><td><code>Condition</code></td><td>Identify T1D (E10.*), T2D (E11.*), hypoglycemia (E16.*);
+        trigger protocol card logic</td></tr>
+    <tr><td><code>MedicationRequest</code></td><td>Detect insulin regimen: pump vs. MDI; identify GLP-1
+        or SGLT2 use (interaction risks with AID)</td></tr>
+    <tr><td><code>Appointment</code></td><td>Trigger pre-visit CGM summary generation on appointment creation</td></tr>
+    <tr><td><code>Task</code></td><td>Create follow-up tasks (e.g., "Review Loop settings at next visit")
+        from plugin logic</td></tr>
+    <tr><td><code>DocumentReference</code></td><td>Attach CGM PDF reports or structured summaries
+        to the chart for billing documentation</td></tr>
+    <tr><td><code>ServiceRequest</code></td><td>Surface lab orders (HbA1c, kidney function) as
+        actionable recommendations</td></tr>
+    <tr><td><code>DiagnosticReport</code></td><td>Wrap a CGM analysis as a structured report with
+        supporting observations</td></tr>
+  </table>
+
+  <h3>Python SDK Plugin Primitives</h3>
+  <table class="api-table">
+    <tr><th>Primitive</th><th>What It Enables</th></tr>
+    <tr><td><strong>Events</strong> (650+)</td><td>React to note opens, chart opens, appointment
+        creation, medication changes, lab results arriving, command execution</td></tr>
+    <tr><td><strong>ProtocolCard effect</strong></td><td>Surface a recommendation card with
+        title, narrative, actions (order labs, create referral, add note)
+        in the patient chart</td></tr>
+    <tr><td><strong>BannerAlert effect</strong></td><td>Persistent chart-level alert for
+        urgent glycemic concerns (recent severe hypo, critical TIR)</td></tr>
+    <tr><td><strong>PatientChartSummary custom section</strong></td><td>Embed a CGM summary
+        panel directly in the patient summary view</td></tr>
+    <tr><td><strong>SimpleAPI handler</strong></td><td>Expose HTTP endpoints inside Canvas
+        for external CGM data push, webhook receivers, or dashboard data serving</td></tr>
+    <tr><td><strong>Data module (Django ORM)</strong></td><td>Read-only access to Canvas
+        patient, condition, medication, and lab data directly from plugin code</td></tr>
+    <tr><td><strong>Async effects</strong></td><td>Schedule delayed effects (e.g.,
+        post-visit summary generation 24h after appointment closes)</td></tr>
+    <tr><td><strong>Autocomplete override</strong></td><td>Customize medication and
+        condition search results for AID-relevant drug interactions</td></tr>
+  </table>
+
+  <div class="callout green">
+    <strong>Key insight:</strong> Canvas plugins run as sandboxed Python on the Canvas
+    instance. They can call out to external services (including our own inference API)
+    via the built-in HTTP client. This means the heavy cgmencode ML work does not
+    need to run inside the plugin itself: the plugin orchestrates data flow while
+    an external service hosts the models.
+  </div>
+</section>
+
+<!-- ======================== NIGHTSCOUT ======================== -->
+<section id="nightscout">
+  <h2>3.5 Nightscout as the Data Bridge</h2>
+  <p>Nightscout is the natural data source for this prototype. It aggregates CGM readings,
+     device status (IOB, COB, temp basal), and treatments across all major AID systems
+     (Loop, AAPS, Trio, OpenAPS) into a unified JSON API. The
+     <code>rag-nightscout-ecosystem-alignment</code> repo has deep tooling built directly
+     on Nightscout's data schema: <code>ns_fetch.py</code>, <code>ns_patients.py</code>,
+     <code>ns_split.py</code>, and the <code>ns2parquet</code> pipeline.</p>
+
+  <h3>Data Available from Nightscout</h3>
+  <table class="api-table">
+    <tr><th>Endpoint</th><th>Data</th><th>cgmencode Mapping</th></tr>
+    <tr>
+      <td><code>/api/v1/entries</code></td>
+      <td>CGM readings (sgv, direction, trend), 5-min cadence</td>
+      <td><code>FixtureEncoder.fixture_to_df()</code> glucose channel</td>
+    </tr>
+    <tr>
+      <td><code>/api/v1/devicestatus</code></td>
+      <td>Loop/AAPS loop object: IOB, COB, enacted basal/SMB, predicted glucose</td>
+      <td>IOB, COB, temp_basal_rate, smb channels; AID algorithm state</td>
+    </tr>
+    <tr>
+      <td><code>/api/v1/treatments</code></td>
+      <td>Manual boluses, carb entries, temp targets, CGM calibrations</td>
+      <td>Bolus and carb channels; event classifier labels</td>
+    </tr>
+    <tr>
+      <td><code>/api/v1/profile</code></td>
+      <td>Basal schedule, ISF, carb ratio, DIA, timezone</td>
+      <td>Baseline for override_recommender deviation analysis</td>
+    </tr>
+  </table>
+
+  <h3>Integration Architecture</h3>
+  <p>The Canvas plugin does not call Nightscout directly. Instead, a lightweight
+     sidecar service (the "cgmencode inference service") mediates:</p>
+  <ol>
+    <li>A patient-to-Nightscout URL mapping is stored as a plugin secret or
+        in a small service registry.</li>
+    <li>On demand (chart open, appointment creation, post-visit), the Canvas
+        plugin calls the inference service with a patient identifier.</li>
+    <li>The inference service fetches Nightscout data, runs the cgmencode
+        pipeline (encoding, metrics, optional ML inference), and returns a
+        structured JSON summary.</li>
+    <li>The plugin renders that summary as Canvas effects (ProtocolCard,
+        BannerAlert, custom chart section, DocumentReference).</li>
+  </ol>
+
+  <div class="callout purple">
+    <strong>Nightscout for T2D patients:</strong> Many insulin-dependent T2D patients
+    do not use AID systems. For these patients, the devicestatus endpoint will be
+    absent or minimal. The pipeline degrades gracefully: glucose-only analysis
+    (TIR, GMI, TBR, variability) is still valuable and sufficient for the care
+    gap and billing use cases. AID-specific features (IOB-based settings recommendations)
+    apply only when devicestatus data is present.
+  </div>
+</section>
+
+<!-- ======================== DEPLOYMENT TOPOLOGY ======================== -->
+<section id="topology">
+  <h2>3.6 Where the Code Lives: Deployment Topology</h2>
+
+  <div class="callout amber">
+    <strong>Decisive constraint (verified against canvas-medical/canvas-plugins v0.173.0 source):</strong>
+    The Canvas plugin runtime executes plugin code under <strong>RestrictedPython</strong> with a
+    hard import allowlist (<code>plugin_runner/sandbox.py</code>, <code>ALLOWED_MODULES</code>).
+    A plugin may import only: a curated subset of the standard library
+    (<code>datetime</code>, <code>json</code>, <code>re</code>, <code>dataclasses</code>,
+    <code>decimal</code>, <code>hashlib</code>, <code>base64</code>, <code>uuid</code>,
+    <code>collections.Counter/defaultdict</code>, <code>typing</code>, <code>enum</code>),
+    a short third-party list (<code>requests</code>, <code>pydantic</code>, <code>arrow</code>,
+    <code>rapidfuzz</code>, <code>jwt</code>, <code>django.db.models</code>), and
+    <code>canvas_sdk.*</code>. <strong>numpy, scipy, pandas, torch, xgboost, sklearn — and
+    even <code>math</code> and <code>statistics</code> — are NOT importable.</strong> Plugins
+    cannot pip-install their own dependencies; <code>installation.py</code> has no per-plugin
+    dependency step. This means <em>none</em> of the cgmencode pipeline can run inside a
+    Canvas plugin. The plugin is strictly an orchestrator.
+  </div>
+
+  <div class="callout green">
+    <strong>What this resolves:</strong> The sidecar architecture is not just preferable, it is
+    <em>required</em>. The good news, also verified in source: outbound HTTP is fully supported.
+    <code>canvas_sdk.utils.http.Http</code> (allowlisted) wraps <code>requests</code> with
+    GET/POST/PUT/PATCH and parallel batch helpers (<code>batch_get</code>, <code>ThreadPoolExecutor</code>).
+    <code>canvas_sdk.clients.canvas_fhir.CanvasFhir</code> is allowlisted for reading Canvas's own
+    FHIR data. So a plugin can call an external T1Pal service and render the result. The earlier
+    finding still holds and matters: because the production pipeline is pure numpy/scipy/pandas
+    (no torch/GPU), that external service is a trivially cheap, CPU-only Python web app.
+  </div>
+
+  <div class="callout blue">
+    <strong>On the cgmencode pipeline itself:</strong> The <code>production/</code> decision-support
+    code does <em>not</em> require PyTorch, XGBoost, or a GPU. It is built on
+    <strong>numpy</strong>, <strong>scipy.stats</strong> (bootstrap CIs, linear regression), and
+    <strong>pandas</strong>. The sklearn dependency is a single optional lazy import inside
+    <code>MealMLModel.train()</code> that degrades gracefully when absent. torch and xgboost
+    exist only in the research/training layer (<code>encoder.py</code>, <code>model.py</code>,
+    <code>hypo_safety.py</code> training code), not in the production inference path. So the
+    sidecar is cheap to run, but it must exist: the sandbox forbids even basic numpy in-plugin.
+  </div>
+
+  <h3>Audit: What the Production Pipeline Actually Needs</h3>
+  <table class="api-table">
+    <tr><th>Module</th><th>Runtime Deps</th><th>What It Does</th></tr>
+    <tr>
+      <td><code>production/pipeline.py</code></td>
+      <td>numpy only</td>
+      <td>Orchestrates all stages: ingest → clean → metabolic → detect → advise → recommend.
+          Target latency: &lt;500ms per patient.</td>
+    </tr>
+    <tr>
+      <td><code>settings_optimizer.py</code></td>
+      <td>numpy (bootstrap CIs via numpy RNG)</td>
+      <td>Extracts optimal ISF/CR/basal from natural experiment windows.
+          Bootstrap confidence intervals on median. Pure statistics.</td>
+    </tr>
+    <tr>
+      <td><code>settings_advisor.py</code></td>
+      <td>numpy + scipy.stats (lstsq, pearsonr)</td>
+      <td>Generates per-period ISF/CR/basal recommendations with
+          ConfidenceGrade and predicted TIR delta. numpy linear algebra + regression.</td>
+    </tr>
+    <tr>
+      <td><code>advisor/_isf_advisors.py</code><br>
+          <code>advisor/_cr_advisors.py</code><br>
+          <code>advisor/_basal_advisors.py</code></td>
+      <td>numpy only</td>
+      <td>13 ISF variants + CR + basal advisors. Each runs a grid search over
+          parameter values using the physics simulator. No model files.</td>
+    </tr>
+    <tr>
+      <td><code>advisor/_simulation.py</code></td>
+      <td>numpy only</td>
+      <td>Counterfactual physics simulation: two-component DIA decay model,
+          predicts TIR under proposed settings. No ML.</td>
+    </tr>
+    <tr>
+      <td><code>hypo_predictor.py</code></td>
+      <td>numpy only</td>
+      <td>Logistic regression with <em>hardcoded coefficients</em> from
+          EXP-1613 (AUC=0.90). No model file to load. Formula:
+          bg_level×(-0.035) + trend×(-0.028) + flux×(0.15) + acceleration×(-0.08).</td>
+    </tr>
+    <tr>
+      <td><code>metabolic_engine.py</code>, <code>forward_simulator.py</code></td>
+      <td>numpy only</td>
+      <td>Physics-based insulin/glucose dynamics: IOB decay, COB absorption,
+          net metabolic flux. No ML.</td>
+    </tr>
+    <tr>
+      <td><code>natural_experiment_detector.py</code></td>
+      <td>numpy only</td>
+      <td>Identifies fasting windows, correction bolus events, isolated meal
+          responses from the time-series. Pattern matching on arrays.</td>
+    </tr>
+    <tr>
+      <td><code>waterfall.py</code>, <code>deconfounding.py</code></td>
+      <td>numpy + scipy.stats + pandas</td>
+      <td>Waterfall decomposition of glucose variance; deconfounding pipeline.
+          scipy used for pearsonr, linregress, ttest. Classical statistics.</td>
+    </tr>
+    <tr>
+      <td><code>meal_predictor.py / MealMLModel</code></td>
+      <td>numpy + sklearn (optional lazy import)</td>
+      <td>GradientBoostingClassifier for meal timing prediction (AUC=0.942).
+          Imported inside a <code>try/except ImportError</code> — the pipeline
+          degrades to rule-based meal detection if sklearn is absent.</td>
+    </tr>
+    <tr>
+      <td><code>clinical_rules.py</code>, <code>recommender.py</code></td>
+      <td>numpy only</td>
+      <td>Rule-based clinical report generation and recommendation ranking.
+          Priority system (safety &gt; TIR &gt; convenience). Pure logic.</td>
+    </tr>
+  </table>
+
+  <h3>The Three Deployment Options, Re-evaluated</h3>
+
+  <div class="tier-grid">
+    <div class="tier-card">
+      <span class="badge badge-amber">Option A</span>
+      <h4>Canvas Plugin (inline) — viable for metrics, not the full pipeline</h4>
+      <p>A plugin cannot import numpy/scipy/pandas/<code>math</code> or pip-install deps.
+         But the sandbox <em>does</em> expose enough builtins (<code>sum</code>, <code>sorted</code>,
+         <code>min</code>/<code>max</code>, <code>len</code>, <code>abs</code>, <code>round</code>,
+         the <code>**</code> power operator, comprehensions) to compute real descriptive CGM
+         metrics in pure Python: TIR/TBR/TAR, mean, GMI, CV (std via <code>x**0.5</code>),
+         and time-of-day percentiles. Plus <code>datetime</code> math and Django ORM aggregates.
+         What it <em>cannot</em> do: the numpy/scipy physics simulation, bootstrap CIs,
+         regression, and ML — i.e. settings extraction and parameter recommendation.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-green">Option B (primary)</span>
+      <h4>T1Pal Sidecar Service</h4>
+      <p>A FastAPI service co-located with T1Pal infrastructure. Data is
+         already there; no PHI leaves T1Pal's HIPAA boundary. Runs the full
+         pipeline on demand or nightly batch. Canvas plugin calls it via
+         <code>canvas_sdk.utils.http.Http</code> and renders cached results.
+         Best for: full pipeline, waterfall, deconfounding, settings optimizer.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-green">Option C (recommended)</span>
+      <h4>Hybrid</h4>
+      <p>Fast path: care-gap rules and threshold alerts run inside Canvas using
+         only allowlisted modules (datetime + ORM aggregates), no external call.
+         Deep path: settings recommendations and pattern analysis call the T1Pal
+         service asynchronously; results cached as a Canvas <code>DocumentReference</code>
+         before the visit. Both latency and depth.</p>
+    </div>
+  </div>
+
+  <h3>What Needs torch/XGBoost (Research Layer Only)</h3>
+  <p>The following are research/training tools, not production inference.
+     They run on the sidecar (or offline), never inside Canvas:</p>
+  <ul>
+    <li><code>encoder.py</code>: tensor conversion for training datasets (torch)</li>
+    <li><code>model.py</code>, <code>toolbox.py</code>: Transformer AE/VAE architecture definitions (torch)</li>
+    <li><code>hypo_safety.py</code>: training loss functions and fine-tuning (torch)</li>
+    <li><code>event_classifier.py</code>: XGBoost training pipeline (xgboost)</li>
+    <li><code>override_recommender.py</code>: counterfactual forecasting via trained checkpoints (torch)</li>
+  </ul>
+  <p>The production hypo predictor uses hardcoded regression coefficients derived from
+     those experiments; it does not load a model file at runtime. But it still uses numpy,
+     so it runs on the sidecar, not in the plugin.</p>
+
+  <h3>Data Flow: Revised</h3>
+  <div class="arch-box">
+    <div class="arch-row">
+      <span class="arch-node amber">Nightscout API<br><small>/entries /devicestatus /treatments /profile</small></span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node purple"><strong>T1Pal sidecar service</strong><br>
+        <small>production/pipeline.py<br>
+        deps: numpy, pandas, scipy<br>
+        no torch, no GPU</small></span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node purple">JSON: tir, tbr, gmi,<br>hypo_alert, settings_recs[],<br>recommendations[]</span>
+    </div>
+    <div style="height:0.6rem"></div>
+    <div class="arch-row">
+      <span class="arch-node green"><strong>Canvas plugin</strong> (RestrictedPython sandbox)<br>
+        <small>Http.get() summary from T1Pal<br>
+        + care-gap rules (datetime + ORM aggregates)<br>
+        + CanvasFhir / Data module reads</small></span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node">ProtocolCard, AddBannerAlert,<br>DocumentReference,<br>CustomSection</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node">Clinician sees it<br>in chart</span>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <strong>Feasibility re-assessment:</strong> Two independent facts, both verified in source.
+    (1) The cgmencode production pipeline is a pure statistics package: deployable as a standard
+    CPU-only Python web service on a $10/month VPS, no GPU, no model weights, no torch. (2) The
+    Canvas plugin sandbox forbids all scientific Python, so that service is mandatory, not optional.
+    The plugin is a thin orchestration + presentation layer (allowlisted modules + SDK effects).
+    Net: lower ML-ops complexity than expected, but a clean two-process split is forced by the
+    sandbox rather than chosen.
+  </div>
+
+  <h3>Should We Mirror CGM Data into Canvas as FHIR?</h3>
+  <p>Writing data into Canvas is well supported, and ingestion is a Canvas-blessed plugin
+     pattern: the SDK ships <code>example_patient_sync</code> and <code>canvas_fhir_client</code>
+     examples. There are two write paths:</p>
+  <table class="api-table">
+    <tr><th>Path</th><th>Mechanism</th><th>Best for</th></tr>
+    <tr>
+      <td><strong>Observation effect</strong></td>
+      <td><code>canvas_sdk.effects.observation.Observation(...)</code> returned from
+          <code>compute()</code>; creates/updates an Observation record in-process
+          (value, units, codings, components, effective_datetime).</td>
+      <td>Writing a small number of <em>derived</em> records (e.g. a weekly TIR/GMI summary)
+          as a side effect of an event the plugin already handles.</td>
+    </tr>
+    <tr>
+      <td><strong>CanvasFhir client</strong></td>
+      <td><code>canvas_sdk.clients.canvas_fhir.CanvasFhir(client_id, client_secret)</code>
+          with <code>.create() / .read() / .search()</code> against
+          <code>fumage-&lt;customer&gt;.canvasmedical.com</code>.</td>
+      <td>Programmatic FHIR writes, including from an external integration service / sidecar.</td>
+    </tr>
+    <tr>
+      <td><strong>SimpleAPI inbound route</strong></td>
+      <td><code>SimpleAPI</code> + <code>APIKeyAuthMixin</code> exposing
+          <code>@api.post(...)</code>; an external system pushes data in and the handler
+          writes records via effects.</td>
+      <td>Event-driven push from Nightscout / a device cloud (one reading or one summary
+          per call). This is the canonical "external system is point of origination" shape.</td>
+    </tr>
+  </table>
+
+  <div class="callout amber">
+    <strong>Practical recommendation: do NOT mirror the raw CGM stream into Canvas.</strong>
+    <ul style="margin:0.4rem 0 0; padding-left:1.2rem;">
+      <li><strong>Volume:</strong> CGM is ~288 readings/day. 14 days &times; a 1,000-patient
+          cohort is ~4M Observations per fortnight. Canvas is a clinical and billing record,
+          not a time-series database. A raw dump bloats the chart and no clinician wants 288
+          glucose values per day in the record.</li>
+      <li><strong>Plugins time out:</strong> a multi-thousand-row backfill loop inside a
+          chart-open handler is the wrong tool. Bulk or continuous ingestion belongs in the
+          sidecar via the FHIR API, or as event-driven single-reading pushes via a SimpleAPI
+          webhook.</li>
+      <li><strong>Write derived artifacts, not the stream:</strong> a periodic CGM summary
+          Observation (TIR/GMI/CV) and a DocumentReference (AGP report). These are clinically
+          meaningful <em>and</em> billable (CPT 95251). The raw 5-minute series stays in
+          Nightscout / the sidecar, its natural home.</li>
+    </ul>
+  </div>
+
+  <h4>Decision guide: when to write into Canvas</h4>
+  <table class="api-table">
+    <tr><th>Goal</th><th>Write to Canvas?</th><th>What to write</th></tr>
+    <tr><td>Render CGM display / triage at point of care</td>
+        <td style="color:#059669">No (POC)</td>
+        <td>Fetch-on-demand from NS, compute in-plugin, render. No persistence needed.</td></tr>
+    <tr><td>Billing documentation (95251 / RPM)</td>
+        <td style="color:#d97706">Yes</td>
+        <td>One DocumentReference (AGP report) + a summary Observation per period.</td></tr>
+    <tr><td>Native Canvas protocols / quality measures should see the data</td>
+        <td style="color:#d97706">Yes</td>
+        <td>Summary Observations (e.g. latest GMI, TIR) — codified, low cardinality.</td></tr>
+    <tr><td>Raw 5-minute stream queryable inside Canvas</td>
+        <td style="color:#dc2626">Almost never</td>
+        <td>Keep in Nightscout / sidecar; expose via the inference API instead.</td></tr>
+  </table>
+
+  <p style="font-size:0.9rem;color:var(--canvas-mid)"><strong>For the POC:</strong> no mirroring.
+     The plugin fetches on demand and renders. A nice stretch goal that demonstrates the write
+     path without abusing the record: emit a single weekly CGM summary Observation plus a
+     DocumentReference, gated behind a note-signed or appointment event.</p>
+</section>
+
+<section id="opportunities">
+  <h2>4. Opportunity Map</h2>
+  <p>Below are specific, concrete things that become possible by combining
+     diabetes ML expertise with the Canvas API surface.</p>
+
+  <h3>A. Automated CGM Summary at Point of Care</h3>
+  <p>When a clinician opens the chart of a patient with diabetes (event:
+     <code>PATIENT_CHART_SUMMARY__SECTION_CONFIGURATION</code> or chart open),
+     the plugin fetches the patient's recent CGM data from a connected
+     source (Nightscout, Tidepool, Dexcom API), runs the
+     <code>FixtureEncoder</code> pipeline and <code>metrics.py</code> to compute
+     TIR, GMI, time below range, and glucose variability, then renders a
+     custom summary section: no manual data entry, no portal switching.</p>
+  <p><em>What this eliminates:</em> The 5-10 minutes clinicians currently spend
+     pulling up a separate app or asking the patient to show their phone.
+     The data is present before the visit begins.</p>
+
+  <h3>B. Hypoglycemia Safety Protocol Card</h3>
+  <p>Using <code>hypo_safety.py</code> output and the
+     <code>ADD_OR_UPDATE_PROTOCOL_CARD</code> effect, surface a card whenever
+     a patient's recent CGM data shows: TBR (time below range) above 4% of day,
+     more than 1 Level 2 hypo (below 54 mg/dL) in the past 14 days, or a
+     hypoglycemia unawareness pattern. The card offers one-click actions to
+     order a glucagon prescription, refer to endocrinology, or adjust the
+     safety targets note.</p>
+
+  <h3>C. Pre-Visit AID Settings Review</h3>
+  <p>On appointment creation (event: <code>APPOINTMENT__PRE_CREATE</code> or
+     created), trigger an async job that runs the <code>override_recommender</code>
+     pipeline on the patient's 30-day CGM / AID device status history.
+     Attach a structured settings summary as a <code>DocumentReference</code>
+     and surface a protocol card: "Suggested insulin settings adjustments
+     available for review." The clinician sees evidence-based recommendations
+     before the patient walks in, rather than spending the visit manually
+     reading pump logs.</p>
+
+  <h3>D. Care Gap Automation (Diabetes Quality Measures)</h3>
+  <p>The following care gaps are high-value and straightforward to automate
+     with Canvas protocol cards, triggered by condition presence (ICD E10/E11)
+     and lab result age:</p>
+  <ul>
+    <li>HbA1c overdue (HEDIS: within 6 months for controlled, 3 months for
+        uncontrolled)</li>
+    <li>Annual kidney function panel (eGFR + UACR): nephropathy screening</li>
+    <li>Annual retinal exam referral</li>
+    <li>Annual foot exam (monofilament) documentation</li>
+    <li>Blood pressure at goal (&lt;130/80 for most diabetes patients)</li>
+    <li>Statin therapy for patients over 40 with diabetes</li>
+    <li>CGM or SMBG frequency adequate for insulin users</li>
+  </ul>
+  <p>Each card offers a one-click action to order the lab or create the
+     referral, directly generating the documentation needed for quality measure
+     credit and physician reimbursement.</p>
+
+  <h3>E. Post-Visit Automated Documentation</h3>
+  <p>After an encounter closes (event: <code>NOTE_STATE_CHANGE_EVENT_UPDATED</code>,
+     status to signed), generate a structured CGM interpretation note appended to
+     the chart as a <code>DocumentReference</code>. This creates the documentation
+     chain that enables billing for CPT 95251 (CGM professional interpretation) and
+     supports RPM billing for the 99454 device data transmission codes.</p>
+
+  <h3>F. Predictive Hypoglycemia Banner</h3>
+  <p>Using the event classifier trained on pre-event windows, when a patient's
+     CGM data (ingested continuously via SimpleAPI webhook) shows a pattern
+     consistent with impending hypoglycemia, trigger an async
+     <code>ADD_BANNER_ALERT</code> effect so the clinician (or care coordinator
+     reviewing the panel) sees a real-time risk flag. This is the most
+     technically ambitious of the near-term opportunities and requires a
+     continuous data feed and a deployed inference service.</p>
+
+  <h3>G. Population Health Panel for AID Patients</h3>
+  <p>Using the Canvas FHIR API from outside the instance, build a population-level
+     cohort view of all patients on AID therapy: TIR distribution, HbA1c trend,
+     care gap completion rate. This can be built as an external application using
+     the FHIR API, feeding Canvas Tasks back for outreach prioritization.</p>
+</section>
+
+<!-- ======================== POC SCOPE ======================== -->
+<section id="poc">
+  <h2>5. Proof-of-Concept Scope: A Self-Contained Plugin</h2>
+
+  <div class="callout green">
+    <strong>The feasibility line, drawn precisely:</strong> The full cgmencode production
+    tooling (settings extraction, parameter recommendation) <em>cannot</em> live in a plugin,
+    because it depends on numpy/scipy physics simulation, bootstrap confidence intervals, and
+    regression. But a <strong>descriptive analysis + display + triage</strong> plugin
+    <em>can</em> be fully self-contained in pure Python, with no sidecar and no external ML.
+    That self-contained slice is exactly the right shape for an open-source portfolio piece.
+  </div>
+
+  <h3>What an Open-Source Portfolio Piece Can Honestly Be</h3>
+  <p>An OSS portfolio plugin is necessarily narrower than the commercial-grade settings
+     engine, and that is fine: it should demonstrate <em>platform fluency and clinical
+     judgment</em>, not ship an unvalidated dosing recommender. The POC proves you can take
+     real CGM data, compute the right clinical metrics, and surface them where a clinician
+     works, end to end, inside Canvas. The heavy statistical pipeline is referenced as the
+     "Phase 2 sidecar," not built into the demo.</p>
+
+  <h3>POC Feature Set</h3>
+  <table class="api-table">
+    <tr><th>Feature</th><th>What It Does</th><th>How (in-plugin, pure Python)</th></tr>
+    <tr>
+      <td><strong>1. CGM Summary Display (NS / AGP style)</strong></td>
+      <td>Latest glucose + trend arrow; 14-day TIR/TBR/TAR bar; GMI, CV, mean;
+          an AGP-style median + IQR band by time of day.</td>
+      <td><code>PatientChartSummaryCustomSection</code> with inline <code>content</code>
+          HTML/SVG built via f-strings. No charting library needed: the AGP band is a
+          handful of <code>&lt;path&gt;</code>/<code>&lt;rect&gt;</code> elements from
+          computed percentiles.</td>
+    </tr>
+    <tr>
+      <td><strong>2. Glycemic Phenotype Triage</strong></td>
+      <td>Classify each patient into hypo-prone, hyper-prone, high-variability, or
+          at-goal/euglycemic, with the driving metric shown.</td>
+      <td>Rule-based classifier on the computed metrics (thresholds below). Surfaced as a
+          <code>ProtocolCard</code> with phenotype + suggested next step.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Hypo Safety Banner</strong></td>
+      <td>Persistent chart banner when Time Below Range or Level-2 hypo frequency is
+          above safety thresholds.</td>
+      <td><code>AddBannerAlert</code> (90-char narrative cap), driven by the same
+          in-plugin TBR computation.</td>
+    </tr>
+    <tr>
+      <td><strong>4. Cohort Triage Panel (Tidepool-style)</strong></td>
+      <td>A list across enrolled patients ranked by phenotype severity, for outreach
+          prioritization ("who needs attention now").</td>
+      <td>Either a <code>SimpleAPI</code> route serving an in-EHR panel, or a small
+          external FHIR client iterating patients. Per-patient metrics still computed
+          in pure Python.</td>
+    </tr>
+    <tr>
+      <td><strong>5. Billing-Readiness Documentation</strong></td>
+      <td>When data sufficiency is met (&ge;72 h for 95251; &ge;16 days/30 for 99454),
+          produce the signed-ready CGM report and a review/sign prompt with the suggested
+          CPT code.</td>
+      <td>Summary <code>Observation</code> effects (TIR/GMI/mean, LOINC-coded) + a
+          <code>DocumentReference</code> (AGP + interpretation) + a <code>ProtocolCard</code>
+          to review and sign. Gated by in-plugin day/hour counts. See &sect;8.</td>
+    </tr>
+  </table>
+
+  <h3>Phenotype Triage Rules (illustrative, ADA/consensus-aligned)</h3>
+  <table class="api-table">
+    <tr><th>Phenotype</th><th>Rule</th><th>Card action</th></tr>
+    <tr><td style="color:#dc2626;font-weight:600">Hypo-prone</td>
+        <td>TBR (&lt;70) &gt; 4% of readings, <em>or</em> any time &lt;54 mg/dL &gt; 1%</td>
+        <td>Review hypo safety plan; consider loosening targets / glucagon Rx</td></tr>
+    <tr><td style="color:#d97706;font-weight:600">Hyper-prone</td>
+        <td>TIR &lt; 70% driven by TAR (&gt;180) &gt; 25%, TBR within range</td>
+        <td>Settings review / intensification; order HbA1c</td></tr>
+    <tr><td style="color:#7c3aed;font-weight:600">High-variability</td>
+        <td>CV &ge; 36% (regardless of mean)</td>
+        <td>Investigate meal timing, missed boluses, pump-site issues</td></tr>
+    <tr><td style="color:#059669;font-weight:600">At-goal / euglycemic</td>
+        <td>TIR &ge; 70%, TBR &lt; 4%, CV &lt; 36%</td>
+        <td>Reinforce; no change. Mark protocol satisfied.</td></tr>
+  </table>
+
+  <h3>Metrics in Pure Python (no numpy, runs in-plugin)</h3>
+  <pre>def cgm_metrics(sgv: list[float]) -> dict:
+    """All standard CGM metrics from a list of mg/dL readings.
+    Uses only sandbox-allowed builtins: sum, len, sorted, ** operator."""
+    n = len(sgv)
+    if n == 0:
+        return {}
+    mean = sum(sgv) / n
+    var = sum((x - mean) ** 2 for x in sgv) / n
+    std = var ** 0.5                              # sqrt without the math module
+    pct = lambda p: sorted(sgv)[min(n - 1, int(p * n))]
+
+    in_range = sum(1 for x in sgv if 70 <= x <= 180)
+    below    = sum(1 for x in sgv if x < 70)
+    very_low = sum(1 for x in sgv if x < 54)
+    above    = sum(1 for x in sgv if x > 180)
+
+    return {
+        "mean": round(mean, 1),
+        "gmi": round(3.31 + 0.02392 * mean, 1),  # GMI %, Bergenstal 2018
+        "cv": round(std / mean * 100, 1),        # %CV; >=36% = high variability
+        "tir": round(100 * in_range / n, 1),
+        "tbr": round(100 * below / n, 1),
+        "tbr_l2": round(100 * very_low / n, 1),
+        "tar": round(100 * above / n, 1),
+        "p25": pct(0.25), "p50": pct(0.50), "p75": pct(0.75),
+    }</pre>
+  <p style="font-size:0.88rem;color:var(--canvas-mid)">This function uses nothing the
+     RestrictedPython sandbox forbids. It can run directly inside the plugin's
+     <code>compute()</code> on glucose pulled from Nightscout (<code>Http.get</code>) or from
+     Canvas FHIR Observations. This is the entire numerical core of the POC.</p>
+
+  <h3>Explicitly Out of POC Scope (Phase 2, sidecar + validation)</h3>
+  <ul>
+    <li><strong>Settings extraction:</strong> ISF/CR/basal optimization
+        (<code>settings_optimizer.py</code>, <code>advisor/</code>) — numpy/scipy physics
+        simulation and bootstrap CIs. Sidecar only.</li>
+    <li><strong>Natural-experiment detection</strong> and counterfactual TIR simulation.</li>
+    <li><strong>ML extras:</strong> sklearn meal-timing prediction; torch pattern retrieval.</li>
+    <li><strong>Any active dosing/parameter recommendation</strong> surfaced to a clinician
+        as actionable — this carries clinical-validation and liability requirements beyond a
+        portfolio artifact, and should be gated behind the validated sidecar.</li>
+  </ul>
+
+  <div class="callout amber">
+    <strong>Why this is the right POC:</strong> It is genuinely self-contained (one plugin,
+    pure Python, installable in a Canvas sandbox with no extra infrastructure), it exercises
+    the full SDK surface that matters (events, custom chart sections, protocol cards, banner
+    alerts, SimpleAPI, Data module, Http client), and it tells an honest story: descriptive
+    analytics and triage today; the validated statistical engine as a clearly-scoped Phase 2.
+  </div>
+</section>
+
+<!-- ======================== TIERS ======================== -->
+<section id="tiers">
+  <h2>6. Delivery Tiers</h2>
+  <p>Ranked by implementation effort, reliance on ML infrastructure, and
+     standalone demo-ability within the Canvas sandbox.</p>
+
+  <div class="tier-grid">
+    <div class="tier-card">
+      <span class="badge badge-green">Tier 1: Prototype-Ready</span>
+      <h4>CGM Chart Summary Section</h4>
+      <p>Plugin fetches Nightscout via T1Pal service, renders TIR/GMI/TBR/hypo count.
+         Production pipeline is numpy/scipy only; no GPU, no model weights.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-green">Tier 1: Prototype-Ready</span>
+      <h4>Diabetes Care Gap Cards</h4>
+      <p>Protocol cards for 6 HEDIS-aligned gaps (HbA1c, retinal, renal, foot,
+         BP, statin). Pure Canvas plugin: condition check + date math. No external service.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-green">Tier 1: Prototype-Ready</span>
+      <h4>Hypo Safety Banner</h4>
+      <p>BannerAlert driven by <code>hypo_predictor.py</code> LR formula (hardcoded
+         coefficients, AUC=0.90). No model file to load. Numpy only.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-amber">Tier 2: MVP (weeks)</span>
+      <h4>Settings Recommendations Card</h4>
+      <p>ISF/CR/basal advisor output surfaced as a ProtocolCard.
+         <code>settings_optimizer.py</code> + <code>advisor/</code> are numpy/scipy;
+         deploy as a FastAPI sidecar. No torch required.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-amber">Tier 2: MVP (weeks)</span>
+      <h4>Pre-Visit AID Settings Review</h4>
+      <p>Appointment event triggers async T1Pal job: 30-day pipeline run,
+         attach DocumentReference, surface protocol card before visit.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-amber">Tier 2: MVP (weeks)</span>
+      <h4>Automated CPT 95251 Documentation</h4>
+      <p>Post-visit DocumentReference with structured CGM summary enables
+         billing. Template + FHIR write; metrics from T1Pal service.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-amber">Tier 2: MVP (weeks)</span>
+      <h4>Population AID Cohort Dashboard</h4>
+      <p>External FHIR API client aggregating TIR/A1c/gap data across
+         enrolled patients. Canvas Tasks for outreach prioritization.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-purple">Tier 3: Research (months)</span>
+      <h4>Meal Prediction Card (ML)</h4>
+      <p>Per-patient GradientBoosting meal timing model (sklearn, AUC=0.942).
+         Optional dep already in the codebase. Surface as eating-soon override suggestion.</p>
+    </div>
+    <div class="tier-card">
+      <span class="badge badge-purple">Tier 3: Research (months)</span>
+      <h4>Peer Comparison / Pattern Retrieval</h4>
+      <p>Embedding-based similarity search across population. Requires
+         torch encoder and vector index. Only torch-dependent production feature.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================== ARCHITECTURE ======================== -->
+<section id="architecture">
+  <h2>7. Architecture Overview</h2>
+
+  <div class="arch-box">
+    <h3 style="margin-top:0">Data Layer</h3>
+    <div class="arch-row">
+      <span class="arch-node amber">Dexcom / LibreLink</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node amber">Nightscout / Tidepool / T1Pal</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node">FHIR Observation (glucose, IOB, COB)</span>
+    </div>
+
+    <h3>Plugin Layer (runs inside Canvas instance)</h3>
+    <div class="arch-row">
+      <span class="arch-node">Canvas Events (chart open, appt created, note signed)</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node green">Python Plugin Handler</span>
+    </div>
+    <div class="arch-row">
+      <span class="arch-node green">Plugin reads FHIR Observations via Data module</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node green">HTTP call to Inference Service (optional)</span>
+    </div>
+    <div class="arch-row">
+      <span class="arch-node green">Plugin returns Effects</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node">ProtocolCard / BannerAlert / CustomSection / DocumentReference</span>
+    </div>
+
+    <h3>Inference Service (optional, external)</h3>
+    <div class="arch-row">
+      <span class="arch-node purple">cgmencode FixtureEncoder + metrics.py</span>
+      <span class="arch-arrow">+</span>
+      <span class="arch-node purple">override_recommender / event_classifier</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node purple">JSON response to plugin</span>
+    </div>
+
+    <h3>Documentation / Billing Chain</h3>
+    <div class="arch-row">
+      <span class="arch-node amber">FHIR DocumentReference</span>
+      <span class="arch-arrow">+</span>
+      <span class="arch-node amber">DiagnosticReport</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-node amber">CPT 95251 / RPM 99454 / 99457</span>
+    </div>
+  </div>
+
+  <h3>Prototype Plugin Skeleton</h3>
+  <p><em>Verified against canvas-medical/canvas-plugins v0.173.0. Uses only allowlisted
+     imports: <code>canvas_sdk.utils.http.Http</code> (not httpx), the real
+     <code>ProtocolCard</code>/<code>AddBannerAlert</code> APIs, and the Data-module
+     <code>Condition</code> query API.</em></p>
+  <pre>from canvas_sdk.effects import Effect
+from canvas_sdk.effects.protocol_card import ProtocolCard, Recommendation
+from canvas_sdk.effects.banner_alert import AddBannerAlert
+from canvas_sdk.events import EventType
+from canvas_sdk.handlers import BaseHandler
+from canvas_sdk.utils.http import Http
+from canvas_sdk.v1.data import Condition
+
+
+class DiabetesCGMHandler(BaseHandler):
+    """Surface CGM summary and care gaps on chart open."""
+
+    RESPONDS_TO = EventType.Name(EventType.PATIENT_CHART_SUMMARY__SECTION_CONFIGURATION)
+
+    # ICD-10 prefixes for diabetes (E10.* T1D, E11.* T2D)
+    DM_PREFIXES = ("E10", "E11")
+
+    def compute(self) -> list[Effect]:
+        patient_id = self.context["patient"]["id"]
+
+        # Diabetes diagnosis check via Data module (Django ORM, allowlisted)
+        has_dm = (
+            Condition.objects.active()
+            .for_patient(patient_id)
+            .filter(codings__code__startswith="E1")
+            .exists()
+        )
+        if not has_dm:
+            return []
+
+        # All cgmencode compute happens in the external T1Pal sidecar.
+        # The plugin only orchestrates via the allowlisted Http client.
+        http = Http()
+        resp = http.get(
+            f"{self.secrets['CGM_SERVICE_URL']}/summary/{patient_id}",
+            headers={"Authorization": f"Bearer {self.secrets['CGM_SERVICE_KEY']}"},
+        )
+        if resp.status_code != 200:
+            return []
+
+        summary = resp.json()              # {tir, tbr, gmi, settings_recs: [...]}
+        tir = summary.get("tir_percent", 0)
+        tbr = summary.get("tbr_percent", 0)
+        gmi = summary.get("gmi")
+
+        effects: list[Effect] = []
+
+        # Hypo safety banner if Time Below Range is critical.
+        # NOTE: AddBannerAlert.narrative is capped at 90 characters.
+        if tbr > 4.0:
+            effects.append(
+                AddBannerAlert(
+                    patient_id=patient_id,
+                    key="cgm-tbr-alert",
+                    narrative=f"Time Below Range {tbr:.1f}% (goal <4%). Review hypo safety plan.",
+                    placement=[AddBannerAlert.Placement.CHART],
+                    intent=AddBannerAlert.Intent.WARNING,
+                ).apply()
+            )
+
+        # Protocol card for TIR below target, with actionable recommendations.
+        if tir < 70:
+            card = ProtocolCard(
+                patient_id=patient_id,
+                key="cgm-tir-below-target",
+                title="CGM Time-in-Range Below Target",
+                narrative=(
+                    f"Current TIR {tir:.0f}% (goal >70%). GMI {gmi or 'N/A'}. "
+                    "Consider settings review or therapy intensification."
+                ),
+                status=ProtocolCard.Status.DUE,
+            )
+            card.recommendations.append(
+                Recommendation(title="Order HbA1c", button="Order")
+            )
+            card.recommendations.append(
+                Recommendation(title="Refer to Endocrinology", button="Refer")
+            )
+            effects.append(card.apply())
+
+        return effects</pre>
+
+  <div class="callout green">
+    <strong>Verified API notes:</strong>
+    <ul style="margin:0.4rem 0 0; padding-left:1.2rem;">
+      <li><code>ProtocolCard</code> requires <code>patient_id</code> (or
+          <code>patient_filter</code>) and a unique <code>key</code>; recommendations are
+          <code>Recommendation</code> objects (or built from a command via
+          <code>command.recommend(title=, button=)</code>), not raw dicts.</li>
+      <li><code>AddBannerAlert.narrative</code> is hard-capped at 90 characters by a Pydantic
+          validator; <code>placement</code> is a list of <code>Placement</code> enums and
+          <code>intent</code> is an <code>Intent</code> enum (info/warning/alert).</li>
+      <li>Outbound HTTP must use <code>canvas_sdk.utils.http.Http</code> (wraps
+          <code>requests</code>); <code>httpx</code> is not allowlisted. Parallel fan-out is
+          available via <code>batch_get</code> + <code>ThreadPoolExecutor</code>.</li>
+      <li>Patient/condition context comes from <code>self.context</code> and the Data module
+          (<code>Condition.objects.active().for_patient(id)</code>), which also supports
+          ValueSet lookups for more robust diabetes cohorting than raw ICD prefixes.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ======================== REIMBURSEMENT ======================== -->
+<section id="reimbursement">
+  <h2>8. Reimbursement and Documentation Chain</h2>
+  <p>Healthcare digital tools succeed when they create a chain of documentation
+     that results in reimbursement for physicians while reducing, not adding to,
+     their workload. The following billing codes are directly supported by the
+     architecture above.</p>
+
+  <table class="api-table">
+    <tr><th>Code</th><th>Description</th><th>Data gate</th><th>What This System Generates</th></tr>
+    <tr>
+      <td><code>CPT 95251</code></td>
+      <td>Ambulatory CGM data interpretation and report, professional</td>
+      <td><strong>&ge;72 h</strong> of CGM data</td>
+      <td>DocumentReference (AGP + interpretation) + summary Observations
+          (TIR, GMI, mean) + clinician review/sign prompt</td>
+    </tr>
+    <tr>
+      <td><code>CPT 99453</code></td>
+      <td>RPM: patient setup and education for remote monitoring device</td>
+      <td>One-time, at enrollment</td>
+      <td>Documented via Task + Note at device enrollment</td>
+    </tr>
+    <tr>
+      <td><code>CPT 99454</code></td>
+      <td>RPM: device supply with daily recordings; 30-day period</td>
+      <td><strong>&ge;16 days</strong> with readings / 30 days</td>
+      <td>In-plugin count of distinct days with data; monthly summary +
+          readiness flag when the 16-day threshold is met</td>
+    </tr>
+    <tr>
+      <td><code>CPT 99457</code></td>
+      <td>RPM: 20+ min of interactive communication per 30-day period</td>
+      <td><strong>&ge;20 min</strong> documented/month</td>
+      <td>Canvas Task + time-tracking for care-coordinator outreach
+          (workflow feature; stubbed/flagged in POC)</td>
+    </tr>
+    <tr>
+      <td><strong>HEDIS / STAR quality measures</strong></td>
+      <td>Diabetes HbA1c control, eye exam, kidney health</td>
+      <td>Per-measure logic</td>
+      <td>Protocol card completions generate codified orders / referrals
+          that count toward measure numerators</td>
+    </tr>
+  </table>
+
+  <h3>Billing-Readiness in the POC</h3>
+  <p>Per the data-lifecycle decision (don't mirror raw streams, do capture statistics and
+     documentation), the reimbursement chain is explicitly <strong>in scope for the proof of
+     concept</strong>. It is low-volume, high-value, and computable in pure Python: exactly the
+     kind of differentiated capability worth showing. The POC produces three things, each gated
+     by the data-sufficiency checks above so an artifact is never emitted on insufficient data:</p>
+  <ol>
+    <li><strong>A signed-ready report (DocumentReference):</strong> the AGP image/summary plus a
+        short structured interpretation. This is the artifact the billing provider reviews and
+        signs for CPT 95251. Typed with an appropriate report LOINC; raw stream not included.</li>
+    <li><strong>Codified summary Observations:</strong> TIR, GMI, mean glucose, %CV as low-cardinality
+        Observations (appropriate LOINC, verified against the practice's coding setup) so the chart,
+        native protocols, and quality measures can consume them.</li>
+    <li><strong>A review-and-sign prompt (ProtocolCard / Task):</strong> surfaces the suggested CPT
+        code and the data-sufficiency status, and routes the clinician to sign. The human sign-off
+        is the step that converts the documentation into a billable service, exactly the step that
+        should require a human.</li>
+  </ol>
+
+  <div class="callout amber">
+    <strong>Honest boundary:</strong> The POC generates the <em>documentation artifact and the
+    billing-readiness signals</em>. It does <strong>not</strong> submit claims, and it is not a
+    billing engine. Actual reimbursement still requires clinician review and signature, an order /
+    established patient relationship, payer coverage, and the practice's billing configuration.
+    The plugin's job is to make the documentation effortless and correctly gated, not to adjudicate.
+    Note also that CGM (95249/95250/95251) and RPM (99453/99454/99457) codes carry bundling rules;
+    the POC should flag the eligible code(s) and let the practice's billing logic decide, rather
+    than co-bill naively.
+  </div>
+
+  <div class="callout amber">
+    <strong>Key friction reduction:</strong> The goal is that the physician sees
+    a protocol card with one-click actions. Clicking "Order HbA1c" generates both
+    the order and the supporting documentation. The chain from CGM data to
+    billable service is fully automated, except for the final clinician sign-off,
+    which is exactly what should require a human.
+  </div>
+</section>
+
+<!-- ======================== QUESTIONS ======================== -->
+<section id="questions">
+  <h2>9. Open Questions and Refinement Areas</h2>
+
+  <div class="question-box">
+    <h4>Resolved Scope Decisions</h4>
+    <ol>
+      <li><strong>Data source:</strong> Nightscout (primary). Tidepool and Dexcom API are
+          stretch targets once the Nightscout path is validated.</li>
+      <li><strong>Patient population:</strong> Both T1D on AID and insulin-dependent T2D.
+          AID-specific features (IOB/COB/settings review) activate only when
+          devicestatus data is present; glucose-only features apply universally.</li>
+      <li><strong>Primary goal:</strong> Open-source Canvas plugin that doubles as a
+          portfolio artifact.</li>
+      <li><strong>ML architecture:</strong> Plugin is a pure orchestrator. cgmencode
+          inference service is a separately hosted Python service respecting the
+          validated experimental findings in <code>externals/</code> and
+          <code>experiments/</code>.</li>
+    </ol>
+  </div>
+
+  <div class="question-box">
+    <h4>Open Questions: Next Round</h4>
+    <ol>
+      <li><strong>Nightscout auth model:</strong> Should the prototype assume each patient
+          supplies their own Nightscout URL + API secret, or is there a shared deployment
+          model (e.g., T1Pal hosted instance) that simplifies onboarding?</li>
+      <li><strong>cgmencode checkpoint availability:</strong> Which validated model
+          checkpoints from the experimental pipeline are stable enough to serve via
+          the inference API? The override_recommender and metrics pipeline are
+          rule-based; which ML models (event classifier, transformer AE) have
+          sufficient validation to expose?</li>
+      <li><strong>Canvas sandbox access:</strong> Do we have (or should we request)
+          a Canvas developer sandbox to test the plugin interactively?</li>
+      <li><strong>Open-source licensing:</strong> The cgmencode repo and its externals
+          need a license audit before any code is surfaced in a public plugin repo.
+          What license is appropriate?</li>
+      <li><strong>Portfolio framing:</strong> Should the plugin README and docs explicitly
+          call out the connection to the Canvas Product Experience Builder role, or
+          stay neutral so it reads as a standalone open-source project?</li>
+    </ol>
+  </div>
+
+  <h3>Resolved by Source Review (canvas-medical/canvas-plugins v0.173.0)</h3>
+  <ul>
+    <li><strong>Plugin dependency model:</strong> RESOLVED. Plugins run under RestrictedPython
+        with a hard import allowlist (<code>plugin_runner/sandbox.py</code>). No numpy/scipy/
+        pandas/math; no per-plugin pip installs. All cgmencode compute must be external.
+        This is now reflected throughout the topology section.</li>
+    <li><strong>Outbound HTTP from a plugin:</strong> RESOLVED. <code>canvas_sdk.utils.http.Http</code>
+        (allowlisted, wraps <code>requests</code>) supports GET/POST/PUT/PATCH plus parallel
+        batch helpers. A plugin can call the T1Pal sidecar directly. No Canvas partnership is
+        required for a plugin to call an externally hosted service the developer controls.</li>
+    <li><strong>SimpleAPI webhook endpoints:</strong> RESOLVED. <code>canvas_sdk.handlers.simple_api</code>
+        provides <code>SimpleAPI</code> / <code>SimpleAPIRoute</code> with <code>@get/@post/@put/@delete</code>
+        route decorators, a <code>Request</code> object (incl. multipart/file parts), and handlers
+        returning <code>list[Response | Effect]</code>. This is the mechanism for receiving a
+        Nightscout push or a sidecar callback inside Canvas.</li>
+    <li><strong>Effect APIs:</strong> RESOLVED. ProtocolCard/AddBannerAlert signatures verified;
+        the plugin skeleton above now matches the real classes (including the 90-char banner
+        narrative cap and required <code>key</code> fields).</li>
+    <li><strong>Data access:</strong> RESOLVED for reads. The Data module exposes
+        <code>Condition</code>, <code>Patient</code>, labs, medications via Django ORM with
+        <code>.for_patient()</code> and ValueSet lookups. Read access is to the Canvas record,
+        not limited to plugin-created rows.</li>
+  </ul>
+
+  <h3>Still Open</h3>
+  <ul>
+    <li><strong>Nightscout auth model:</strong> Per-patient URL + token, or a shared T1Pal-hosted
+        registry? Affects onboarding UX and where the patient↔Nightscout mapping is stored
+        (plugin secret vs. sidecar registry).</li>
+    <li><strong>FHIR Observation bulk ingest:</strong> If we choose to mirror CGM history into
+        Canvas as Observations (vs. keeping it only in the sidecar), confirm batch/bundle support
+        to avoid per-reading POSTs. The current design keeps CGM data in the sidecar and only
+        writes summaries as DocumentReference, sidestepping this.</li>
+    <li><strong>cgmencode checkpoint availability:</strong> The rule-based + statistical
+        production pipeline (metrics, hypo_predictor, settings_advisor/optimizer) needs no
+        checkpoints. Only the optional ML extras (sklearn meal model; torch pattern retrieval)
+        do. Decide whether to expose those in v1.</li>
+    <li><strong>Canvas developer sandbox:</strong> Request an instance to test plugin install,
+        effects rendering, and the SimpleAPI webhook end-to-end.</li>
+    <li><strong>Open-source licensing:</strong> License audit of cgmencode and its
+        <code>externals/</code> before any code is surfaced in a public plugin repo.</li>
+    <li><strong>Portfolio framing:</strong> Should the plugin README explicitly reference the
+        Canvas role, or read as a neutral standalone open-source project?</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  canvas-health-prototype &nbsp;|&nbsp; Ben West &nbsp;|&nbsp; June 2026
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+    "sdk_version": "0.1.4",
+    "plugin_version": "0.1.0",
+    "name": "cgm_insights",
+    "description": "CGM analysis, glycemic phenotype triage, and (M2) billing-readiness documentation from Nightscout data.",
+    "components": {
+        "handlers": [
+            {
+                "class": "cgm_insights.handlers.chart_summary:CGMSummarySection",
+                "description": "Renders an AGP-style CGM summary as a custom patient chart section."
+            },
+            {
+                "class": "cgm_insights.handlers.triage:CGMTriageProtocol",
+                "description": "Surfaces a glycemic phenotype triage ProtocolCard and optional hypoglycemia-safety banner on encounter creation."
+            }
+        ],
+        "commands": [],
+        "content": [],
+        "effects": [],
+        "views": []
+    },
+    "variables": [
+        {
+            "name": "NIGHTSCOUT_URL",
+            "sensitive": true
+        },
+        {
+            "name": "NIGHTSCOUT_TOKEN",
+            "sensitive": true
+        }
+    ],
+    "tags": {},
+    "references": [],
+    "license": "MIT",
+    "diagram": false,
+    "readme": "./README.md"
+}
