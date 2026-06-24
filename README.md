@@ -13,6 +13,12 @@ parameter recommendation) is intentionally deferred to an external service
 ("Phase 2 / sidecar"); see [`docs/plan.html`](docs/plan.html) for the full
 feasibility analysis and architecture.
 
+![The CGM Insights app rendering in a Canvas chart: glycemic phenotype, hypo-safety banner, time-in-range metrics, and an AGP chart](docs/screenshots/cgm-insights-app.png)
+
+> The **CGM Insights** application running live in a Canvas sandbox (demo mode):
+> phenotype triage, hypoglycemia-safety banner, time-in-range metrics, and the
+> AGP chart — rendered from synthetic, de-identified data.
+
 ## What it does (Milestone 1)
 
 - **CGM summary display** — an Ambulatory Glucose Profile (AGP) chart and the
