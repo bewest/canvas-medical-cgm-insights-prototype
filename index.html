@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cgm_insights — Canvas Medical CGM plugin</title>
+  <style>
+    :root { --blue:#1a56db; --dark:#111827; --mid:#374151; --light:#f9fafb; --border:#e5e7eb; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+           background:var(--light); color:var(--dark); line-height:1.6; }
+    header { background:var(--blue); color:#fff; padding:3rem 1.5rem; text-align:center; }
+    header h1 { font-size:2.2rem; font-weight:700; letter-spacing:-0.5px; }
+    header p { margin-top:.6rem; opacity:.9; max-width:640px; margin-left:auto; margin-right:auto; }
+    main { max-width:880px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+    .lead { font-size:1.05rem; color:var(--mid); margin-bottom:2rem; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.25rem; }
+    .card { display:block; background:#fff; border:1px solid var(--border); border-radius:12px;
+            padding:1.5rem; text-decoration:none; color:inherit; transition:box-shadow .15s,transform .15s; }
+    .card:hover { box-shadow:0 6px 20px rgba(0,0,0,.08); transform:translateY(-2px); }
+    .card h2 { font-size:1.15rem; color:var(--blue); margin-bottom:.4rem; }
+    .card p { font-size:.92rem; color:var(--mid); }
+    .card .tag { display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase;
+                 letter-spacing:.05em; color:#065f46; background:#d1fae5; border-radius:99px;
+                 padding:2px 9px; margin-bottom:.7rem; }
+    h3 { margin:2.5rem 0 .8rem; font-size:1.2rem; border-left:4px solid var(--blue); padding-left:.7rem; }
+    ul { padding-left:1.3rem; color:var(--mid); }
+    li { margin-bottom:.35rem; }
+    code { font-family:"SFMono-Regular",Menlo,monospace; background:#f3f4f6; border:1px solid var(--border);
+           border-radius:4px; padding:1px 5px; font-size:.85em; }
+    .repo { margin-top:2.5rem; font-size:.95rem; }
+    .repo a { color:var(--blue); }
+    footer { text-align:center; color:#9ca3af; font-size:.82rem; padding:2rem; border-top:1px solid var(--border); }
+  </style>
+</head>
+<body>
+<header>
+  <h1>cgm_insights</h1>
+  <p>An open-source Canvas Medical plugin that turns continuous glucose monitor (CGM)
+     data into clinical decision support inside the EHR: an AGP-style summary,
+     glycemic phenotype triage, and CGM/RPM billing-readiness documentation.</p>
+</header>
+
+<main>
+  <p class="lead">This page links the project's design and demo artifacts. The plugin itself
+     reads CGM data from Nightscout, computes metrics in pure Python (sandbox-safe), and surfaces
+     results as Canvas chart applications, protocol cards, and a hypoglycemia-safety banner.</p>
+
+  <div class="cards">
+    <a class="card" href="./plan.html">
+      <span class="tag">Design</span>
+      <h2>Feasibility &amp; Architecture &rarr;</h2>
+      <p>The full analysis: Canvas SDK/sandbox constraints, the Nightscout bridge,
+         deployment topology, the proof-of-concept scope, reimbursement chain, and
+         the plugin code skeleton.</p>
+    </a>
+    <a class="card" href="./preview.html">
+      <span class="tag">Demo</span>
+      <h2>CGM Display Preview &rarr;</h2>
+      <p>A static render of the in-Canvas output for four synthetic patient phenotypes:
+         AGP chart, time-in-range metrics, triage, and billing readiness.</p>
+    </a>
+  </div>
+
+  <h3>What it does</h3>
+  <ul>
+    <li><strong>CGM summary display</strong> — Ambulatory Glucose Profile (AGP) + TIR / GMI / %CV,
+        rendered as a launchable chart application.</li>
+    <li><strong>Glycemic phenotype triage</strong> — hypoglycemia-prone, hyperglycemia-prone,
+        high-variability, or at-goal, as a Canvas protocol card with a hypo-safety banner.</li>
+    <li><strong>Billing-readiness documentation</strong> — gated by data sufficiency
+        (&ge;72 h for CPT 95251, &ge;16 days for CPT 99454): a codified summary observation and a
+        clinician review/sign prompt.</li>
+  </ul>
+
+  <h3>Design notes</h3>
+  <ul>
+    <li>All analysis lives in a dependency-free <code>core/</code> package (no numpy/scipy/pandas),
+        so it runs unchanged inside the Canvas RestrictedPython sandbox and is unit-tested with plain pytest.</li>
+    <li>Ships only <strong>synthetic, de-identified</strong> CGM fixtures — no PHI.</li>
+    <li>Does not mirror the raw glucose stream into Canvas; writes only low-cardinality summaries.</li>
+  </ul>
+
+  <p class="repo">Source: <a href="https://github.com/bewest/canvas-medical-cgm-insights-prototype">
+     github.com/bewest/canvas-medical-cgm-insights-prototype</a> &nbsp;&middot;&nbsp; MIT licensed</p>
+</main>
+
+<footer>cgm_insights &nbsp;|&nbsp; Ben West &nbsp;|&nbsp; 2026</footer>
+</body>
+</html>
