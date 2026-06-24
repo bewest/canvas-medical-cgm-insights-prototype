@@ -60,8 +60,36 @@ python -m fixtures.generate    # (re)write synthetic fixtures
 pytest                         # run the suite
 ```
 
-Validate / install the plugin (requires the Canvas CLI and a configured
-instance):
+## Trying it out / manual testing
+
+Three ways to exercise it, from quickest to most realistic.
+
+**1. Visual preview (no Canvas, no network).** Renders the in-Canvas output
+(AGP chart, triage, billing readiness) for every synthetic phenotype:
+
+```bash
+python -m scripts.preview          # writes docs/preview.html
+# open docs/preview.html in a browser
+```
+
+**2. Run the pipeline manually (CLI).** Exercises the exact core the plugin
+uses and prints metrics, triage, and the Canvas effects it would emit:
+
+```bash
+# against a bundled synthetic fixture:
+python -m scripts.run --fixture hypo_prone --effects
+
+# against YOUR live Nightscout instance (reads + displays locally only;
+# nothing is written to Canvas, so no PHI is moved anywhere):
+python -m scripts.run --url https://your-ns.example --token YOUR_READ_TOKEN
+
+# also write an AGP HTML preview of that data:
+python -m scripts.run --fixture at_goal --html /tmp/out.html
+```
+
+**3. Install into a Canvas sandbox (end-to-end).** Requires the Canvas CLI and
+a configured instance (`~/.canvas/credentials.ini`). Use a **de-identified**
+Nightscout source, since data written into Canvas must not contain PHI.
 
 ```bash
 pip install canvas
@@ -69,7 +97,15 @@ canvas validate-manifest cgm_insights
 canvas install cgm_insights \
   --variable NIGHTSCOUT_URL=https://your-ns.example \
   --variable NIGHTSCOUT_TOKEN=your-read-token
+canvas logs            # stream plugin logs while you interact
+
+# Then, in the Canvas UI:
+#   - Open a patient chart  -> the CGM summary custom section renders.
+#   - Create an encounter note for that patient (NOTE_STATE_CHANGE_EVENT_CREATED)
+#     -> the phenotype triage ProtocolCard (+ hypo banner) appears, and, when the
+#        patient's CGM data is sufficient, the billing-readiness card.
 ```
+
 
 ## Data & privacy
 
