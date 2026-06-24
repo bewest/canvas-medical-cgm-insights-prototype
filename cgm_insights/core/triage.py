@@ -9,12 +9,11 @@ a dosing recommendation. Anything that proposes insulin/parameter changes lives
 behind the validated sidecar, not here.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
 
-from .metrics import (
+from cgm_insights.core.metrics import (
     CGMMetrics,
     HIGH_CV_THRESHOLD,
     TBR_GOAL,

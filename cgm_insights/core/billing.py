@@ -14,12 +14,11 @@ terminology (LOINC/SNOMED) before production use. They are centralized here so
 that mapping is a one-line change.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .metrics import CGMMetrics, estimated_hours
-from .nightscout import GlucoseReading
+from cgm_insights.core.metrics import CGMMetrics, estimated_hours
+from cgm_insights.core.nightscout import GlucoseReading
 
 # --- Billing thresholds (Medicare/CPT) ---
 CPT_95251_MIN_HOURS = 72.0    # CGM interpretation & report: >= 72 h of data

@@ -11,7 +11,6 @@ References:
   * Bergenstal et al. 2018: GMI = 3.31 + 0.02392 * mean_glucose_mgdl.
 """
 
-from __future__ import annotations
 
 from dataclasses import dataclass
 

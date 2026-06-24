@@ -4,7 +4,6 @@ Renders the inline AGP + metrics HTML produced by ``core.agp`` into a
 ``PatientChartSummaryCustomSection`` effect.
 """
 
-from __future__ import annotations
 
 from canvas_sdk.effects import Effect
 from canvas_sdk.effects.patient_chart_summary_custom_section import (

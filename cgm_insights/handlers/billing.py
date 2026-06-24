@@ -12,7 +12,6 @@ Honest boundaries (see docs/plan.html):
     decides. CGM/RPM codes carry bundling rules.
 """
 
-from __future__ import annotations
 
 from datetime import datetime, timezone
 

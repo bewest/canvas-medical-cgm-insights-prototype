@@ -10,10 +10,9 @@ inter-quartile band by hour of day, with the 70-180 mg/dL target range shaded,
 plus a metrics header.
 """
 
-from __future__ import annotations
 
-from .metrics import CGMMetrics, TIR_HIGH, TIR_LOW
-from .nightscout import GlucoseReading
+from cgm_insights.core.metrics import CGMMetrics, TIR_HIGH, TIR_LOW
+from cgm_insights.core.nightscout import GlucoseReading
 
 # SVG geometry.
 _W = 720

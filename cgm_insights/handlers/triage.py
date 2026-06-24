@@ -7,7 +7,6 @@ SECTION_CONFIGURATION`` is deliberately NOT used here because the platform
 forbids these effect types from that event.
 """
 
-from __future__ import annotations
 
 from canvas_sdk.effects import Effect
 from canvas_sdk.effects.banner_alert import AddBannerAlert

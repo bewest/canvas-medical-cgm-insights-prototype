@@ -10,11 +10,10 @@ The injected getter must accept ``(url, headers)`` and return an object with
 ``requests.Response`` / Canvas ``Http`` contract.
 """
 
-from __future__ import annotations
 
 from typing import Any, Callable, Protocol
 
-from .nightscout import NightscoutData, parse_nightscout
+from cgm_insights.core.nightscout import NightscoutData, parse_nightscout
 
 # How many readings to request (14 days at 5-min cadence ~= 4032).
 DEFAULT_COUNT = 4500

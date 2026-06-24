@@ -10,7 +10,6 @@ token are supplied via plugin secrets ``NIGHTSCOUT_URL`` and
 per-patient base URL stored on the Canvas patient record.
 """
 
-from __future__ import annotations
 
 from canvas_sdk.utils.http import Http
 
