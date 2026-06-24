@@ -118,6 +118,26 @@ Then, in the Canvas UI:
   triage ProtocolCard (+ hypo banner) appears, and, when the patient's CGM data
   is sufficient, the billing-readiness card.
 
+### Demo mode (see output without a real Nightscout)
+
+To exercise the plugin in a sandbox **without configuring Nightscout and without
+moving any PHI into Canvas**, enable demo mode — it feeds a bundled, deterministic
+**synthetic** series (hypoglycemia-prone, ~18 days):
+
+```bash
+canvas config set cgm_insights DEMO_MODE=1 --host <subdomain>
+```
+
+Now creating an encounter note for any patient renders the triage card, the
+hypo-safety banner, and the billing-readiness card (CPT 95251 + 99454) from
+synthetic data. Watch it with `canvas logs --host <subdomain>`. Turn it off with
+`canvas config set cgm_insights DEMO_MODE= --host <subdomain>`.
+
+> Note: the CGM **chart-summary section** additionally requires registering the
+> section into the chart layout (`SHOW_PATIENT_CHART_SUMMARY_SECTIONS`), which
+> replaces the layout globally; it is intentionally left out so the plugin does
+> not alter shared-instance chart layouts.
+
 
 ## Data & privacy
 

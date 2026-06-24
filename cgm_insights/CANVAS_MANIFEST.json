@@ -31,6 +31,10 @@
         {
             "name": "NIGHTSCOUT_TOKEN",
             "sensitive": true
+        },
+        {
+            "name": "DEMO_MODE",
+            "sensitive": false
         }
     ],
     "tags": {},
