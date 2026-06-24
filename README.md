@@ -118,6 +118,20 @@ Then, in the Canvas UI:
   triage ProtocolCard (+ hypo banner) appears, and, when the patient's CGM data
   is sufficient, the billing-readiness card.
 
+### Where it appears in Canvas
+
+After install, the plugin surfaces in a few places:
+
+| What | Where to find it |
+| --- | --- |
+| **"CGM Insights" launcher (global)** | The top-level **app drawer** (same place as other global apps). Opens the CGM view as a full page. |
+| **"CGM Insights" launcher (patient)** | A patient chart's **app drawer** (open a patient first). Opens the CGM view in a right-hand pane. |
+| **Triage card + hypo banner + billing card** | Open a patient and **create an encounter note** (`NOTE_STATE_CHANGE_EVENT_CREATED`). |
+| **Handler activity / logs** | `canvas logs --host <subdomain>` while you interact. |
+| **Plugin + config** | Admin/Settings → Extensions/Plugins → `cgm_insights` (set `DEMO_MODE` / `NIGHTSCOUT_URL`). |
+
+With `DEMO_MODE=1`, all of the above render from synthetic data (no Nightscout, no PHI). You may need to refresh the Canvas page after (re)installing for new launchers to appear.
+
 ### Demo mode (see output without a real Nightscout)
 
 To exercise the plugin in a sandbox **without configuring Nightscout and without
