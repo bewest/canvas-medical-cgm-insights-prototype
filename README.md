@@ -82,8 +82,11 @@ canvas install cgm_insights \
 ## Status
 
 - [x] **M1** — Nightscout fetch, pure-Python metrics, AGP display, phenotype triage
-- [ ] **M2** — billing-readiness documentation (summary Observations, DocumentReference, sign prompt)
+- [x] **M2** — billing-readiness documentation (summary Observations, review/sign card, data-sufficiency gates for CPT 95251 / 99454)
 - [ ] **M3** — external sidecar for settings extraction / parameter recommendation
+
+A static render of the in-Canvas output for each synthetic phenotype is in
+[`docs/preview.html`](docs/preview.html) (regenerate with `python -m scripts.preview`).
 
 ## License
 

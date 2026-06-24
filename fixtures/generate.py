@@ -28,7 +28,7 @@ PROFILES = {
 }
 
 CADENCE_MIN = 5
-DAYS = 14
+DAYS = 20  # >16 days so the RPM 99454 data-sufficiency gate is demonstrable
 
 
 def _glucose_series(profile: dict) -> list[tuple[int, float]]:

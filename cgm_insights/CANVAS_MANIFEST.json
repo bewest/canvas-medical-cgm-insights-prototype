@@ -12,6 +12,10 @@
             {
                 "class": "cgm_insights.handlers.triage:CGMTriageProtocol",
                 "description": "Surfaces a glycemic phenotype triage ProtocolCard and optional hypoglycemia-safety banner on encounter creation."
+            },
+            {
+                "class": "cgm_insights.handlers.billing:CGMBillingDocumentation",
+                "description": "When CGM data-sufficiency is met, emits a codified summary Observation and a review/sign ProtocolCard for CGM/RPM billing readiness."
             }
         ],
         "commands": [],
