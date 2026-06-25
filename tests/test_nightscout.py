@@ -73,12 +73,20 @@ def test_empty_inputs():
     assert nd.sgv_values == []
 
 
+def test_aid_fixture_has_device_status():
+    from tests.conftest import load_nightscout
+
+    nd = load_nightscout("aid_well_controlled")
+    assert nd.has_aid is True
+    assert any(d.iob is not None for d in nd.device_status)
+
+
 def test_fixture_parses(phenotype_name):
     from tests.conftest import load_nightscout
 
     nd = load_nightscout(phenotype_name)
     assert len(nd.entries) > 1000
-    # Synthetic fixtures are T2D-style (no AID device status).
+    # The base phenotype fixtures are glucose-only (no AID device status).
     assert nd.has_aid is False
     # Chronological order.
     epochs = [r.epoch_ms for r in nd.entries]

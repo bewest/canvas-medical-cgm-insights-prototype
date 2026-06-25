@@ -29,7 +29,12 @@ import random
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
-from fixtures.synth_model import PRESETS, synth_series
+from fixtures.synth_model import (
+    EXPECTED_CLASSIFICATION,
+    PRESETS,
+    synth_device_status,
+    synth_series,
+)
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), "synthetic")
 
@@ -69,6 +74,22 @@ PHENOTYPE_SOURCES = {
         day_ok=lambda s: s["cv"] >= 38 and s["tbr"] < 4,
         real_days=11,
     ),
+    # Post-meal spiker: good fasting, large post-meal excursions (hybrid).
+    "post_meal_spiker": dict(
+        patients=["b", "e", "d"],
+        day_ok=lambda s: s["tar"] >= 30 and s["tbr"] < 3 and s["cv"] < 34 and s["tir"] < 70,
+        real_days=11,
+    ),
+    # Nocturnal hypo: overnight lows (hybrid, hypo-prone source patients).
+    "nocturnal_hypo": dict(
+        patients=["i", "h"],
+        day_ok=lambda s: s["tbr"] >= 6,
+        real_days=11,
+    ),
+    # Dawn phenomenon: specific early-morning pattern -> synthetic-only.
+    "dawn_phenomenon": dict(synthetic_only=True),
+    # Well-controlled T1D on AID (with IOB/COB) -> synthetic-only.
+    "aid_well_controlled": dict(synthetic_only=True),
 }
 
 
@@ -185,7 +206,7 @@ def build_phenotype(name: str, spec: dict, rng: random.Random) -> tuple[list[dic
     Returns (entries, provenance). Falls back to fully synthetic if no real
     data is available.
     """
-    real_days = _select_real_days(spec, rng)
+    real_days = [] if spec.get("synthetic_only") else _select_real_days(spec, rng)
     provenance = {"real_days": 0, "synthetic_days": 0, "source_patients": []}
 
     series: list[tuple[int, float]] = []
@@ -207,10 +228,13 @@ def build_phenotype(name: str, spec: dict, rng: random.Random) -> tuple[list[dic
                 series += _synthetic_day(name, day_index, rng)
                 provenance["synthetic_days"] += 1
     else:
-        # No external real data — fully synthetic fallback.
+        # No external real data (or synthetic-only) — fully synthetic.
         series = synth_series(PRESETS[name], DAYS, START, PRESETS[name].seed)
         provenance["synthetic_days"] = DAYS
-        provenance["fallback"] = "synthetic-only (no external real data)"
+        provenance["fallback"] = (
+            "synthetic-only" if spec.get("synthetic_only")
+            else "synthetic-only (no external real data)"
+        )
 
     series.sort()
     return _entries(series), provenance
@@ -261,7 +285,9 @@ def build() -> dict:
         entries, provenance = build_phenotype(name, spec, random.Random(rng.randint(1, 10 ** 9)))
         bundle = {
             "entries": entries,
-            "devicestatus": [],
+            "devicestatus": synth_device_status(
+                PRESETS[name], DAYS, START, PRESETS[name].seed
+            ),
             "treatments": [],
             "profile": _profile_doc(),
         }

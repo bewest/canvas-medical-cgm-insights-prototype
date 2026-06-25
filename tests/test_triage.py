@@ -48,6 +48,15 @@ def test_each_fixture_classifies_to_its_name(phenotype_name):
     assert result.phenotype.value == phenotype_name
 
 
+def test_all_scenario_fixtures_match_expected(any_fixture_name):
+    from tests.conftest import EXPECTED_CLASSIFICATION, load_nightscout
+
+    nd = load_nightscout(any_fixture_name)
+    m = compute_metrics(nd.sgv_values)
+    result = classify(m)
+    assert result.phenotype.value == EXPECTED_CLASSIFICATION[any_fixture_name]
+
+
 def test_hypo_banner_narrative_within_90_chars():
     sgv = [40.0] * 30 + [120.0] * 70
     m = compute_metrics(sgv)

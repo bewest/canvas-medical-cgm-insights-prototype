@@ -60,6 +60,7 @@ class SynthParams:
     vmin: float = 39.0
     vmax: float = 401.0
     seed: int = 0                  # default RNG seed for this phenotype
+    aid: bool = False              # emit synthetic AID device-status (IOB/COB)
 
 
 def _dawn(hour: float, amp: float) -> float:
@@ -192,4 +193,101 @@ PRESETS: dict[str, SynthParams] = {
             Meal(18.5, 190, tau_decay=160, mag_jitter=0.7),
         ],
     ),
+    # ── Additional clinically-distinct scenarios (map to triage buckets) ──
+    "dawn_phenomenon": SynthParams(  # prominent 03:00-08:00 rise, otherwise at goal
+        baseline=92, dawn_amp=55, ar_sigma=9, seed=55,
+        meals=[Meal(7.5, 40), Meal(12.5, 45), Meal(18.5, 42)],
+    ),
+    "post_meal_spiker": SynthParams(  # good fasting, large post-meal excursions -> hyper
+        baseline=95, dawn_amp=15, ar_sigma=10, seed=66,
+        meals=[
+            Meal(7.5, 135, tau_decay=200),
+            Meal(12.5, 150, tau_decay=210),
+            Meal(18.5, 140, tau_decay=205),
+        ],
+    ),
+    "nocturnal_hypo": SynthParams(  # overnight lows, otherwise controlled -> hypo
+        baseline=110, dawn_amp=12, ar_sigma=9, seed=77,
+        meals=[Meal(7.5, 40), Meal(12.5, 45), Meal(18.5, 42)],
+        hypo_rate=1.0, hypo_depth=58, hypo_sd=0.9,
+    ),
+    "aid_well_controlled": SynthParams(  # T1D on AID, tight control, with IOB/COB
+        baseline=115, dawn_amp=10, ar_sigma=8, seed=88, aid=True,
+        meals=[Meal(7.5, 35), Meal(12.5, 40), Meal(18.5, 38)],
+    ),
 }
+
+
+# Expected triage classification for each scenario (used to validate fixtures).
+EXPECTED_CLASSIFICATION: dict[str, str] = {
+    "at_goal": "at_goal",
+    "hyper_prone": "hyper_prone",
+    "hypo_prone": "hypo_prone",
+    "high_variability": "high_variability",
+    "dawn_phenomenon": "at_goal",
+    "post_meal_spiker": "hyper_prone",
+    "nocturnal_hypo": "hypo_prone",
+    "aid_well_controlled": "at_goal",
+}
+
+
+def synth_device_status(
+    params: SynthParams,
+    days: int,
+    start: datetime,
+    seed: int,
+    cadence_min: int = 15,
+) -> list[dict]:
+    """Generate plausible synthetic AID device-status (IOB/COB) records.
+
+    Values are illustrative, not a physiological simulation: COB rises at meals
+    and decays over ~3 h; IOB reflects a basal floor plus meal boluses decaying
+    over a ~5 h insulin action window. Shaped like Nightscout Loop records so
+    ``has_aid`` is true and the AID data path is exercised.
+    """
+    if not params.aid:
+        return []
+    rng = random.Random(seed)
+    carb_ratio = 10.0
+    cob_absorb_min = 180.0
+    dia_min = 300.0
+
+    # Pre-roll meal boluses/carbs.
+    events = []  # (abs_min, carbs_g)
+    for d in range(days):
+        for m in params.meals:
+            if rng.random() > m.prob:
+                continue
+            t0 = d * 24 * 60 + m.hour * 60 + rng.uniform(-m.jitter_min, m.jitter_min)
+            carbs = max(5.0, m.mag * 0.45 * (1.0 + rng.uniform(-0.2, 0.2)))
+            events.append((t0, carbs))
+    events.sort()
+
+    out: list[dict] = []
+    n = days * 24 * 60 // cadence_min
+    for i in range(n):
+        abs_min = i * cadence_min
+        cob = 0.0
+        iob = 0.8  # basal floor
+        for t0, carbs in events:
+            dt = abs_min - t0
+            if 0 <= dt < cob_absorb_min:
+                cob += carbs * (1.0 - dt / cob_absorb_min)
+            if 0 <= dt < dia_min:
+                bolus = carbs / carb_ratio
+                iob += bolus * (1.0 - dt / dia_min)
+            if t0 > abs_min:
+                break
+        ts = (start + timedelta(minutes=abs_min)).isoformat()
+        epoch_ms = int((start + timedelta(minutes=abs_min)).timestamp() * 1000)
+        out.append(
+            {
+                "date": epoch_ms,
+                "dateString": ts,
+                "loop": {
+                    "iob": {"iob": round(iob, 2)},
+                    "cob": {"cob": round(cob, 1)},
+                },
+            }
+        )
+    return out

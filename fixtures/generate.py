@@ -15,7 +15,7 @@ import json
 import os
 from datetime import datetime, timezone
 
-from fixtures.synth_model import PRESETS, synth_series
+from fixtures.synth_model import PRESETS, synth_device_status, synth_series
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), "synthetic")
 
@@ -69,7 +69,7 @@ def generate() -> None:
         series = synth_series(params, DAYS, START, params.seed)
         bundle = {
             "entries": _entries(series),
-            "devicestatus": [],  # glucose-only (T2D-style) unless overridden
+            "devicestatus": synth_device_status(params, DAYS, START, params.seed),
             "treatments": [],
             "profile": _profile_doc(),
         }
