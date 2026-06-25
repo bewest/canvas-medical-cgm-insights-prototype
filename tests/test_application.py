@@ -23,6 +23,18 @@ def test_render_view_no_data():
     assert "No Nightscout CGM data" in html
 
 
+def test_render_cohort_covers_all_phenotypes():
+    from cgm_insights.applications.cgm_app import render_cohort
+    from cgm_insights.core.demo_data import DEMO_PHENOTYPES, PHENOTYPE_LABELS
+
+    html = render_cohort()
+    assert "phenotype cohort" in html
+    # Every phenotype label appears, each with an AGP chart.
+    for name in DEMO_PHENOTYPES:
+        assert PHENOTYPE_LABELS[name] in html
+    assert html.count("<svg") == len(DEMO_PHENOTYPES)
+
+
 def test_application_imports_and_identifier():
     from cgm_insights.applications.cgm_app import CGMChartApp, CGMGlobalApp
 

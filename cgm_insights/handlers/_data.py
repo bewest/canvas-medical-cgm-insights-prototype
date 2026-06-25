@@ -25,12 +25,30 @@ from cgm_insights.core.nightscout import NightscoutData
 _DEMO_SENTINEL = "demo"
 
 
+def _demo_phenotype(secrets: dict) -> str | None:
+    """Return the requested demo phenotype, or None if demo mode is off.
+
+    Demo mode is on when DEMO_MODE is truthy or NIGHTSCOUT_URL == 'demo'. If
+    DEMO_MODE names a phenotype (e.g. 'hypo_prone'), that series is used; any
+    other truthy value uses the default phenotype.
+    """
+    from cgm_insights.core.demo_data import DEFAULT_PHENOTYPE, DEMO_SERIES
+
+    s = secrets or {}
+    raw = str(s.get("DEMO_MODE", "")).strip()
+    low = raw.lower()
+    if low in DEMO_SERIES:
+        return low
+    if low in ("1", "true", "yes", "on"):
+        return DEFAULT_PHENOTYPE
+    if (s.get("NIGHTSCOUT_URL", "") or "").strip().lower() == _DEMO_SENTINEL:
+        return DEFAULT_PHENOTYPE
+    return None
+
+
 def _demo_enabled(secrets: dict) -> bool:
     """True if demo mode is requested via DEMO_MODE or NIGHTSCOUT_URL=demo."""
-    s = secrets or {}
-    if str(s.get("DEMO_MODE", "")).strip().lower() in ("1", "true", "yes", "on"):
-        return True
-    return (s.get("NIGHTSCOUT_URL", "") or "").strip().lower() == _DEMO_SENTINEL
+    return _demo_phenotype(secrets) is not None
 
 
 def load_patient_cgm(secrets: dict) -> NightscoutData:
@@ -40,8 +58,9 @@ def load_patient_cgm(secrets: dict) -> NightscoutData:
     NightscoutData when no Nightscout URL is configured (so handlers no-op
     gracefully), else the live Nightscout fetch.
     """
-    if _demo_enabled(secrets):
-        return demo_nightscout()
+    phenotype = _demo_phenotype(secrets)
+    if phenotype is not None:
+        return demo_nightscout(phenotype)
 
     base_url = (secrets or {}).get("NIGHTSCOUT_URL", "").strip()
     if not base_url:

@@ -141,8 +141,8 @@ With `DEMO_MODE=1`, all of the above render from synthetic data (no Nightscout, 
 ### Demo mode (see output without a real Nightscout)
 
 To exercise the plugin in a sandbox **without configuring Nightscout and without
-moving any PHI into Canvas**, enable demo mode — it feeds a bundled, deterministic
-**synthetic** series (hypoglycemia-prone, ~18 days):
+moving any PHI into Canvas**, enable demo mode — it feeds bundled, deterministic
+**synthetic** series:
 
 ```bash
 canvas config set cgm_insights DEMO_MODE=1 --host <subdomain>
@@ -153,12 +153,23 @@ hypo-safety banner, and the billing-readiness card (CPT 95251 + 99454) from
 synthetic data. Watch it with `canvas logs --host <subdomain>`. Turn it off with
 `canvas config set cgm_insights DEMO_MODE= --host <subdomain>`.
 
+**See every phenotype:** the global **"CGM Insights"** app (top-level app drawer)
+opens a **cohort gallery** rendering all eight demo phenotypes (at-goal,
+hyperglycemia-prone, hypoglycemia-prone, high-variability, dawn-phenomenon,
+post-meal-spiker, nocturnal-hypo, well-controlled-AID) as AGP charts with their
+triage. To make the single-patient views show a specific phenotype instead of the
+default, set `DEMO_MODE` to its name:
+
+```bash
+canvas config set cgm_insights DEMO_MODE=high_variability --host <subdomain>
+```
+
 > Note: the CGM **chart-summary section** additionally requires registering the
 > section into the chart layout (`SHOW_PATIENT_CHART_SUMMARY_SECTIONS`), which
 > replaces the layout globally; it is intentionally left out so the plugin does
-> not alter shared-instance chart layouts. Instead, the plugin registers a
-> **patient-chart Application** ("CGM Insights") — a launcher icon in the chart
-> that opens the AGP view in a right-hand pane, without touching the global layout.
+> not alter shared-instance chart layouts. Instead, the plugin registers
+> **Applications** ("CGM Insights") — launcher icons (patient chart and global
+> app drawer) that open the views without touching the global layout.
 
 
 ## Data & privacy
