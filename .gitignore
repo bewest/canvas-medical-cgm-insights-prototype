@@ -43,3 +43,8 @@ data/private/
 *.phi.json
 local-nightscout/
 .venv/
+
+# Real CGM source data must never be committed (build_fixtures reads it externally)
+real-ns-data/
+fixtures/real/
+*.real.json
