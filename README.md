@@ -163,8 +163,13 @@ synthetic data. Watch it with `canvas logs --host <subdomain>`. Turn it off with
 
 ## Data & privacy
 
-- The repository ships **only synthetic, de-identified** CGM fixtures
-  (`fixtures/synthetic/`, produced by `fixtures/generate.py`). No PHI.
+- The repository ships **only de-identified** CGM fixtures (`fixtures/synthetic/`).
+  They are **hybrid**: fuzzed real CGM days (date-shifted, value-jittered,
+  metadata-stripped, blended across ≥2 patients for k-anonymity) stitched with
+  synthetic days from a physiological model, plus fully-synthetic scenarios. Raw
+  patient data stays external and is never committed. See
+  [`fixtures/FIXTURES.md`](fixtures/FIXTURES.md) for the de-identification method
+  and provenance; `tests/test_fixture_safety.py` enforces the no-PHI guarantees.
 - The plugin does **not** mirror the raw 5-minute glucose stream into Canvas.
   Milestone 2 writes only low-cardinality summary `Observation`s and a
   `DocumentReference` report, the artifacts that support CPT 95251 / RPM billing.

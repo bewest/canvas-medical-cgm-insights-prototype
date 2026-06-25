@@ -20,7 +20,10 @@ from cgm_insights.core.triage import classify, hypo_safety_check
 FIXTURE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "fixtures", "synthetic")
 OUT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "preview.html")
 
-PHENOTYPES = ["at_goal", "hyper_prone", "hypo_prone", "high_variability"]
+PHENOTYPES = [
+    "at_goal", "hyper_prone", "hypo_prone", "high_variability",
+    "dawn_phenomenon", "post_meal_spiker", "nocturnal_hypo", "aid_well_controlled",
+]
 
 
 def _section(name: str) -> str:
