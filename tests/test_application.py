@@ -32,7 +32,8 @@ def test_render_cohort_covers_all_phenotypes():
     # Every phenotype label appears, each with an AGP chart.
     for name in DEMO_PHENOTYPES:
         assert PHENOTYPE_LABELS[name] in html
-    assert html.count("<svg") == len(DEMO_PHENOTYPES)
+    # Each phenotype panel renders a TIR bar SVG + an AGP chart SVG.
+    assert html.count("<svg") == 2 * len(DEMO_PHENOTYPES)
 
 
 def test_application_imports_and_identifier():

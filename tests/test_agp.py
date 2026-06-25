@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from cgm_insights.core.agp import hourly_percentiles, render_agp
+from cgm_insights.core.agp import (
+    hourly_percentiles,
+    render_agp,
+    render_tir_bar,
+)
 from cgm_insights.core.metrics import compute_metrics
 from cgm_insights.core.nightscout import GlucoseReading
 
@@ -19,8 +23,8 @@ def _readings_24h() -> list[GlucoseReading]:
 def test_hourly_percentiles_keys():
     pcts = hourly_percentiles(_readings_24h())
     assert set(pcts) <= set(range(24))
-    for _, (p25, p50, p75) in pcts.items():
-        assert p25 <= p50 <= p75
+    for _, (p5, p25, p50, p75, p95) in pcts.items():
+        assert p5 <= p25 <= p50 <= p75 <= p95
 
 
 def test_render_agp_is_escaped_html():
@@ -30,14 +34,29 @@ def test_render_agp_is_escaped_html():
     assert html.startswith("<div")
     assert "<svg" in html
     assert "polyline" in html or "polygon" in html
-    # No unescaped device strings leak raw angle brackets into attributes.
     assert "viewBox" in html
+
+
+def test_render_includes_tir_bar():
+    m = compute_metrics([50.0] * 10 + [120.0] * 70 + [300.0] * 20)
+    html = render_agp(m, [])
+    assert "Time in ranges" in html
+    # All five zone labels appear in the legend.
+    for label in ("Very low", "In range", "Very high"):
+        assert label in html
+
+
+def test_tir_bar_segments_reflect_zones():
+    # Pure in-range data -> only the target color appears as a segment.
+    m = compute_metrics([120.0] * 100)
+    bar = render_tir_bar(m)
+    assert 'fill="#1a9850"' in bar      # target green segment
+    assert 'fill="#7e1416"' not in bar  # no very-low segment (legend aside)
 
 
 def test_render_agp_handles_empty_readings():
     m = compute_metrics([120.0] * 10)
     html = render_agp(m, [])
-    # Still renders the chart frame even with no per-hour band.
     assert "<svg" in html
 
 
